@@ -10,7 +10,7 @@ Interactions-Only User Installable Bot built in Typescript
 # Running
 
 - Install deps
-  ``bun add`
+  `bun add`
 - Rename `.example.env`, fill it
 - RUn `bun commands` to deploy the commands
 - Run `bun start` to start the bot

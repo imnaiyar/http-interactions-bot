@@ -1,0 +1,73 @@
+{
+  "name": "http-bot",
+  "module": "app.ts",
+  "type": "module",
+  "main": "./dist/app.js",
+  "scripts": {
+    "commands": " bun run src/handlers/registerCommands.ts",
+    "start": " bun run src/app.ts",
+    "build": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^4.17.21",
+    "eslint": "^9.3.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsdoc": "^48.2.5",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^1.8.1",
+    "@discordjs/collection": "^2.1.0",
+    "@discordjs/core": "^1.2.0",
+    "@discordjs/formatters": "^0.4.0",
+    "@discordjs/rest": "^2.3.0",
+    "@discordjs/util": "^1.1.0",
+    "@sapphire/discord-utilities": "^3.2.3",
+    "@sapphire/snowflake": "^3.5.3",
+    "@sapphire/stopwatch": "^1.5.2",
+    "discord-interactions": "^3.4.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "toml": "^3.0.0",
+    "tomlify": "^0.2.2"
+  },
+  "imports": {
+    "#handlers": [
+      "./dist/handlers/index.js"
+    ],
+    "#handlers/*": [
+      "./dist/handlers/*.js"
+    ],
+    "#src/*": [
+      "./dist/*.js"
+    ],
+    "#commands/*": [
+      "./dist/commands/*.js"
+    ],
+    "#root/*": [
+      "./*"
+    ],
+    "#structures/*": [
+      "./dist/structures/*.js"
+    ],
+    "#structures": [
+      "./dist/structures/index.js"
+    ],
+    "#libs/*": [
+      "./dist/libs/*.js"
+    ],
+    "#libs": [
+      "./dist/libs/index.js"
+    ]
+  },
+  "trustedDependencies": [
+    "@sapphire/type"
+  ]
+}
+

@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [ your_branch_name ]  # Only run on commits to your specific branch
+    branches: [ master ]  
 
 jobs:
   deploy:

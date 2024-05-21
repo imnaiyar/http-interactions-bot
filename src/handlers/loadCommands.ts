@@ -25,13 +25,13 @@ export async function loadSlash(dirs: string) {
 }
 export async function loadContext(dirs: string) {
   const files = recursiveReadDir(dirs);
-  const commands = new Collection<string, ContextMenu>();
+  const commands = new Collection<string, ContextMenu<"Message" | "User">>();
   for (const file of files) {
     const fileName = path.basename(file);
 
     try {
       const { default: command } = (await import(pathToFileURL(file).href)) as {
-        default: ContextMenu;
+        default: ContextMenu<"Message" | "User">;
       };
       if (typeof command !== "object") continue;
       if (commands.has(command.data.name)) throw new Error("Command already exists");

@@ -6,7 +6,7 @@
   "scripts": {
     "commands": " bun run src/handlers/registerCommands.ts",
     "start": " bun run src/app.ts",
-    "build": "bun install && bun commands && bun start"
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/bun": "latest",

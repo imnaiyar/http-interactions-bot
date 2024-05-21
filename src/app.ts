@@ -20,7 +20,6 @@ import { Collection } from "@discordjs/collection";
 import type { ContextMenu, SlashCommand } from "#structures";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 import { Collector } from "#libs";
-const PORT = process.env.PORT || 5007;
 
 export default new (class App extends EventEmitter {
   public server = express();
@@ -53,8 +52,8 @@ export default new (class App extends EventEmitter {
         return await this.handleAutocomplete(interaction as APIApplicationCommandAutocompleteInteraction, res);
       }
     });
-    this.server.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    this.server.listen(this.config.PORT, () => {
+      console.log(`Server is running on port ${this.config.PORT}`);
     });
   }
   async handleApplication(interaction: APIApplicationCommandInteraction) {

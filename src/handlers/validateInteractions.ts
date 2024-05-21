@@ -4,7 +4,7 @@ import type App from "#src/app";
 export const validate = (
   app: typeof App,
   interaction: APIApplicationCommandInteraction,
-  command: SlashCommand | ContextMenu | undefined,
+  command: SlashCommand | ContextMenu<"Message" | "User"> | undefined,
 ) => {
   if (!command) {
     app.api.interactions.reply(interaction.id, interaction.token, {

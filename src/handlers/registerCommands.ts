@@ -6,7 +6,7 @@ import { Routes } from "@discordjs/core/http-only";
 const contexts = await loadContext("src/commands/contexts");
 const slash = await loadSlash("src/commands/slash");
 
-const toRegister: SlashCommand["data"] | ContextMenu["data"][] = [];
+const toRegister: SlashCommand["data"] | ContextMenu<"Message" | "User">["data"][] = [];
 slash
   .map((cmd) => ({
     name: cmd.data.name,

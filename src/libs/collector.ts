@@ -1,6 +1,3 @@
-/**
- * © TAEMBO {@link https://github.com/TAEMBO TAEMBO}
- */
 import { type APIInteraction, type APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
 import { EventEmitter } from "node:events";
 import type App from "#src/app";
@@ -9,6 +6,7 @@ interface CollectorOptions {
   filter?: (int: APIMessageComponentInteraction) => boolean;
   max?: number;
   timeout?: number;
+  idle?: number;
 }
 declare interface Collector {
   on(event: "collect", listener: (args: APIMessageComponentInteraction) => any): this;
@@ -26,8 +24,11 @@ class Collector extends EventEmitter {
   ) {
     super();
     this.filter = options.filter ?? (() => true);
-    this.timer = options.timeout ? setTimeout(() => this.end("timeout"), options.timeout) : undefined;
-
+    this.timer = options.timeout
+      ? setTimeout(() => this.end("timeout"), options.timeout)
+      : options.idle
+        ? setTimeout(() => this.end("timeout"), options.idle)
+        : undefined;
     this.listener = this.listener.bind(this);
 
     app.addListener("interaction", this.listener);
@@ -43,6 +44,11 @@ class Collector extends EventEmitter {
     this.emit("collect", int);
 
     this.collected.push(int);
+    if (this.options.idle) {
+      clearTimeout(this.timer);
+      console.log("collector reset");
+      this.timer = setTimeout(() => this.end("timeout"), this.options.idle);
+    }
 
     if (this.options.max && this.collected.length >= this.options.max) this.end("max");
   }
@@ -51,7 +57,6 @@ class Collector extends EventEmitter {
     this.app.removeListener("interaction", this.listener);
 
     clearTimeout(this.timer);
-
     this.emit("end", this.collected, reason);
   }
 }

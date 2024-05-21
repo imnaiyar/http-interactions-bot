@@ -177,3 +177,4 @@ bookmarks.toml
 pnpm-lock.yaml
 bun.lockb
 dist
+src/commands/slash/test.ts

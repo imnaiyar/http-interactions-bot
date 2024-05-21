@@ -14,6 +14,7 @@ import {
   ApplicationCommandType,
   type APIChatInputApplicationCommandInteraction,
   type APIContextMenuInteraction,
+  MessageFlags,
 } from "@discordjs/core/http-only";
 import { Collection } from "@discordjs/collection";
 import type { ContextMenu, SlashCommand } from "#structures";
@@ -24,10 +25,11 @@ const PORT = process.env.PORT || 5007;
 export default new (class App extends EventEmitter {
   public server = express();
   public slash: Collection<string, SlashCommand> = new Collection();
-  public contexts: Collection<string, ContextMenu> = new Collection();
+  public contexts: Collection<string, ContextMenu<"User" | "Message">> = new Collection();
   public collector = Collector;
   public config = config;
   public api = new API(new REST().setToken(process.env.TOKEN!));
+  public ephemeral = MessageFlags.Ephemeral;
   constructor() {
     super();
     this.init();
@@ -68,7 +70,7 @@ export default new (class App extends EventEmitter {
         console.error(err);
       }
     }
-    if (interaction.data.type === ApplicationCommandType.Message) {
+    if (interaction.data.type === ApplicationCommandType.Message || interaction.data.type === ApplicationCommandType.User) {
       const command = this.contexts.get(interaction.data.name);
       const isValid = validate(this, interaction, command);
       if (!isValid) return;

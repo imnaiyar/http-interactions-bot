@@ -16,11 +16,11 @@ jobs:
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        password: ${{ secrets.SSH_PASSWORD }}
 
     - name: Pull
       run: |
-        ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd http-interactions-bot && git pull"
+        ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd h-bot && git pull"
 
     - name: Restart
       run: |

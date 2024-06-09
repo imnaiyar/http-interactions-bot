@@ -1,8 +1,9 @@
 import { IntegrationType, type SlashCommand } from "#structures";
-import { EmbedBuilder } from "@discordjs/builders";
+import { codeBlock, EmbedBuilder } from "@discordjs/builders";
 import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { postToHaste } from "#libs";
+import util from "node:util";
 export default {
   data: {
     name: "eval",
@@ -70,7 +71,7 @@ export default {
       const time = new Stopwatch().start();
       const output = await eval(code);
       time.stop();
-      result = await buildSuccessResponse(output, time.toString(), haste, parseInt(dp));
+      result = await buildSuccessResponse(output, time.toString(), haste, parseInt(dp), code);
     } catch (err) {
       result = buildErrorResponse(err);
     }
@@ -78,19 +79,19 @@ export default {
   },
 } satisfies SlashCommand;
 
-const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number) => {
+const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
   // Token protection
-  output = require("util").inspect(output, { depth: depth }).replaceAll(process.env.TOKEN, "~~REDACTED~~");
+  output = util.inspect(output, { depth: depth }).replaceAll(process.env.TOKEN!, "~~REDACTED~~");
   let embOutput;
 
   if (!haste && output.length <= 2048) {
-    embOutput = `\`\`\`js\n${output}\n\`\`\``;
+    embOutput = codeBlock("js", output);
   } else {
     embOutput = await postToHaste(output);
   }
   const embed = new EmbedBuilder()
     .setAuthor({ name: "📤 Output" })
-    .setDescription(embOutput)
+    .setDescription(`**Input**\n` + codeBlock(input) + "\n**Output" + embOutput)
     .setColor(0x2c9438)
     .setFooter({
       text: `⏱️ Took ${time}`,

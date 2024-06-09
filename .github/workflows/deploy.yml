@@ -2,26 +2,25 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [ master ]  
+    branches: [ master ]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3  
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Connect to VPS
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
 
-    - name: Pull
-      run: |
-        ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd h-bot && git pull"
-
-    - name: Restart
-      run: |
-        ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "pm2 restart 2"
+      - name: Deploy to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd h-bot
+            git pull
+            pm2 restart 2
+          EOF

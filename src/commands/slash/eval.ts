@@ -91,7 +91,7 @@ const buildSuccessResponse = async (output: any, time: string, haste: boolean, d
   }
   const embed = new EmbedBuilder()
     .setAuthor({ name: "📤 Output" })
-    .setDescription(`**Input**\n` + codeBlock(input) + "\n**Output" + embOutput)
+    .setDescription(`**Input**\n\n` + codeBlock(input) + "\n**Output**\n\n" + embOutput)
     .setColor(0x2c9438)
     .setFooter({
       text: `⏱️ Took ${time}`,

@@ -34,7 +34,7 @@ export default {
         const embed = new EmbedBuilder()
             .setTitle("Reminders")
             .setDescription(
-                `Reminders saved\n Text: \`${text}\`\n\nIn: \`${dur}\``
+                `Reminders saved\nText: \`${text}\`\n\nIn: \`${dur}\``
             )
             .setColor(0x3cff2e);
         await app.api.interactions.reply(interaction.id, interaction.token, {

@@ -1,7 +1,7 @@
 import { ContextType, IntegrationType, type SlashCommand } from "#structures";
 import { MessageFlags } from "@discordjs/core";
 import { ApplicationCommandOptionType } from "@discordjs/core/http-only";
-import { EmbedBuilder } from "@discrodjs/builders";
+import { EmbedBuilder } from "@discordjs/builders";
 
 export default {
     data: {

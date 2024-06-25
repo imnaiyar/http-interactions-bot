@@ -20,6 +20,7 @@ export default {
             ContextType.PrivateChannels
         ]
     },
+ownerOnly: true,
     async run(app, interaction, options) {
         const hide = options.getBoolean("ephemeral");
         app.ephemeral = hide ? MessageFlags.Ephemeral : undefined;

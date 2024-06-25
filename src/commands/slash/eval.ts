@@ -73,6 +73,7 @@ export default {
       time.stop();
       result = await buildSuccessResponse(output, time.toString(), haste, parseInt(dp), code);
     } catch (err) {
+      console.error(err);
       result = buildErrorResponse(err);
     }
     await app.api.interactions.editReply(interaction.application_id, interaction.token, result);
@@ -81,7 +82,7 @@ export default {
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
   // Token protection
-  output = util.inspect(output, { depth: depth }).replaceAll(process.env.TOKEN!, "~~REDACTED~~");
+  output = util.inspect(output, { depth: depth }).replaceAll(process.env.TOKEN!, "~~REDACTED~~").replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED--'");
   let embOutput;
 
   if (!haste && output.length <= 2048) {

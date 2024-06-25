@@ -28,6 +28,7 @@ export default {
             ContextType.PrivateChannels
         ]
     },
+    ownerOnly: true,
     async run(app, interaction, options) {
         const dur = options.getString("duration", true);
         const text = options.getString("text", true);

@@ -1,4 +1,4 @@
-import { recursiveReadDir } from "#libs";
+import { recursiveReadDir } from "#src/utils/index";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
 import type { ContextMenu, SlashCommand } from "#structures";

@@ -27,7 +27,7 @@
     "@discordjs/formatters": "^0.4.0",
     "@discordjs/rest": "^2.3.0",
     "@discordjs/util": "^1.1.0",
-    "@sapphire/discord-utilities": "^3.2.3",
+    "@sapphire/discord-utilities": "^3.3.0",
     "@sapphire/snowflake": "^3.5.3",
     "@sapphire/stopwatch": "^1.5.2",
     "discord-interactions": "^3.4.0",
@@ -59,15 +59,14 @@
     "#structures": [
       "./dist/structures/index.js"
     ],
-    "#libs/*": [
-      "./dist/libs/*.js"
+    "#utils/*": [
+      "./dist/utils/*.js"
     ],
-    "#libs": [
-      "./dist/libs/index.js"
+    "#utils": [
+      "./dist/utils/index.js"
     ]
   },
   "trustedDependencies": [
     "@sapphire/type"
   ]
 }
-

@@ -19,7 +19,7 @@ import {
 import { Collection } from "@discordjs/collection";
 import type { ContextMenu, SlashCommand } from "#structures";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
-import { Collector } from "#libs";
+import { Collector } from "#src/utils/index";
 
 export default new (class App extends EventEmitter {
   public server = express();
@@ -28,7 +28,7 @@ export default new (class App extends EventEmitter {
   public collector = Collector;
   public config = config;
   public api = new API(new REST().setToken(process.env.TOKEN!));
-  public ephemeral = MessageFlags.Ephemeral;
+  public ephemeral: MessageFlags | undefined = MessageFlags.Ephemeral;
   constructor() {
     super();
     this.init();
@@ -57,6 +57,7 @@ export default new (class App extends EventEmitter {
     });
   }
   async handleApplication(interaction: APIApplicationCommandInteraction) {
+    // @ts-ignore
     const options = new InteractionOptionResolver(interaction);
     if (interaction.data.type === ApplicationCommandType.ChatInput) {
       const commandName = interaction.data.name;
@@ -88,6 +89,7 @@ export default new (class App extends EventEmitter {
         data: { choices: [{ name: "No command found! SOmething went wrong", value: null }] },
       });
     }
+    // @ts-ignore
     const options = new InteractionOptionResolver(interaction);
     try {
       const run = command.autocomplete!;

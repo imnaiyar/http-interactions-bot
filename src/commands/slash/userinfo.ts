@@ -1,4 +1,4 @@
-import { formatUserInfo } from "#libs";
+import { formatUserInfo } from "#src/utils/index";
 import type { SlashCommand } from "#structures";
 import { ApplicationCommandOptionType } from "@discordjs/core";
 export default {

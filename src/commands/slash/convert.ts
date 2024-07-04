@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "@discordjs/builders";
 import { type SlashCommand } from "#structures";
-import { formatString } from "../../utilities";
+import { formatString } from "#utils";
 import { ApplicationCommandOptionType } from "@discordjs/core";
 
 interface Quantity {

@@ -29,9 +29,8 @@
       "#root/*": ["./*"],
       "#structures/*": ["./src/structures/*"],
       "#structures": ["./src/structures/index"],
-      "#libs/*": ["./src/libs/*"],
-      "#libs": ["./src/libs/index"]
+      "#utils/*": ["./src/utils/*"],
+      "#utils": ["./src/utils/index"]
     }
   }
 }
-

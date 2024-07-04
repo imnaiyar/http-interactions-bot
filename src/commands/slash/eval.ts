@@ -2,7 +2,7 @@ import { IntegrationType, type SlashCommand } from "#structures";
 import { codeBlock, EmbedBuilder } from "@discordjs/builders";
 import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
 import { Stopwatch } from "@sapphire/stopwatch";
-import { postToHaste } from "#libs";
+import { postToHaste } from "#src/utils/index";
 import util from "node:util";
 export default {
   data: {
@@ -82,7 +82,10 @@ export default {
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
   // Token protection
-  output = util.inspect(output, { depth: depth }).replaceAll(process.env.TOKEN!, "~~REDACTED~~").replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED--'");
+  output = util
+    .inspect(output, { depth: depth })
+    .replaceAll(process.env.TOKEN!, "~~REDACTED~~")
+    .replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED--'");
   let embOutput;
 
   if (!haste && output.length <= 2048) {

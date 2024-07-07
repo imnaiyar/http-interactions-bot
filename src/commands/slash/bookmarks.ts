@@ -183,7 +183,7 @@ export default {
             v.messageId.toLocaleLowerCase().includes(value.toLocaleLowerCase()),
         )
         .map((v) => ({
-          name: `${v.username}: ${v.content.substring(0, 10)}...`,
+          name: `${v.username}: ${v.content.substring(0, 40)}...`,
           value: v.messageId.toString(),
         }));
       app.api.interactions.createAutocompleteResponse(interaction.id, interaction.token, {

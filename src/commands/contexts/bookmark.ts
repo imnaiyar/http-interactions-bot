@@ -27,7 +27,7 @@ export default {
     if (bookmarks[authorId][message.id]) {
       await app.api.interactions.reply(interaction.id, interaction.token, {
         content: "This message is already bookmarked",
-        flags: MessageFlags.Ephemeral,
+        flags: app.ephemeral,
       });
       return;
     }
@@ -42,6 +42,7 @@ export default {
     fs.writeFileSync("bookmarks.toml", tomlify(bookmarks, { delims: false }));
     await app.api.interactions.reply(interaction.id, interaction.token, {
       content: "Bookmark saved!",
+      flags: app.ephemeral,
     });
   },
 } satisfies ContextMenu<"Message">;

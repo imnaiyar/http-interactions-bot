@@ -46,10 +46,8 @@ export default {
     const haste = options.getBoolean("haste") || false;
     const hide = options.getBoolean("hide");
     await app.api.interactions.defer(interaction.id, interaction.token, {
-      ...(hide && {
-        flags: MessageFlags.Ephemeral,
-      }),
-    });
+        flags: app.ephemeral,
+       });
     if (async) code = `(async () => { ${code} })()`;
     const dp = options.getString("depth") || "0";
     const regex = /^\d+$|^Infinity$|^null$/;
@@ -58,7 +56,6 @@ export default {
     if (code.includes("process.env")) {
       return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
         content: "You cannot evaluate an expression that may expose secrets",
-        flags: MessageFlags.Ephemeral,
       }));
     }
     if (!match) {

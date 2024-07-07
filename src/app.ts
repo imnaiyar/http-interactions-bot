@@ -54,6 +54,7 @@ export default new (class App extends EventEmitter {
     });
     this.server.listen(this.config.PORT, () => {
       console.log(`Server is running on port ${this.config.PORT}`);
+      this.api.users.get(process.env.CLIENT_ID!).then((u) => console.log("Logged in as " + u.username))
     });
   }
   async handleApplication(interaction: APIApplicationCommandInteraction) {

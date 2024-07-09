@@ -46,7 +46,12 @@ export default {
     const haste = options.getBoolean("haste") || false;
     const hide = options.getBoolean("hide");
     await app.api.interactions.defer(interaction.id, interaction.token, {
-        flags: hide ? MessageFlags.Ephemeral : app.ephemeral,
+        flags:
+                hide === null
+                    ? app.ephemeral
+                    : hide
+                    ? MessageFlags.Ephemeral
+                    : undefined
        });
     if (async) code = `(async () => { ${code} })()`;
     const dp = options.getString("depth") || "0";

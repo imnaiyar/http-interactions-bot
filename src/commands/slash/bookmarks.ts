@@ -149,12 +149,6 @@ export default {
                 content: "Bookmark Deleted",
                 embeds: [],
                 components: [],
-                flags:
-                hide === null
-                    ? app.ephemeral
-                    : hide
-                    ? MessageFlags.Ephemeral
-                    : undefined
               });
               break;
             }

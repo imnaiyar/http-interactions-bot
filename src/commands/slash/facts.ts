@@ -23,10 +23,9 @@ export default {
     },
     async run(app, interaction, options) {
         const hide = options.getBoolean("hide");
-        console.log(hide, "hide")
         await app.api.interactions.defer(interaction.id, interaction.token, {
             flags:
-                hide === undefined
+                hide === null
                     ? app.ephemeral
                     : hide
                     ? MessageFlags.Ephemeral

@@ -22,12 +22,18 @@ export default {
         ]
     },
     async run(app, interaction, options) {
-        const response = await fetch('https://thefact.space/random');
-        const { text, source } = await response.json()
         const hide = options.getBoolean("hide");
-        await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: `**Random Fact**\n> ${text}\n\n[Source](${source})`,
+        await app.api.interactions.defer(interaction.id, interaction.token, {
             flags: hide ? MessageFlags.Ephemeral : app.ephemeral
         });
+        const response = await fetch("https://thefact.space/random");
+        const { text, source } = await response.json();
+        await app.api.interactions.editReply(
+            interaction.application_id,
+            interaction.token,
+            {
+                content: `**Random Fact**\n> ${text}\n\n[Source](<${source}>)`
+            }
+        );
     }
 } satisfies SlashCommand;

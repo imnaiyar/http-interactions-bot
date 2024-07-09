@@ -59,7 +59,7 @@ export default {
       }));
     }
     if (!match) {
-      return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
         content: `${dp} is not a valid depth`,
       }));
     }

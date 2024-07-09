@@ -37,7 +37,7 @@ export default {
             interaction.application_id,
             interaction.token,
             {
-                content: `**Random Fact**\n> ${text}\n\n[Source](<${source}>)`
+                content: `**Random Fact**\n\n> ${text}\n\n[Source](<${source}>)`
             }
         );
     }

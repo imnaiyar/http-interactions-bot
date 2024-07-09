@@ -24,7 +24,7 @@ export default {
     async run(app, interaction, options) {
         const hide = options.getBoolean("hide");
         await app.api.interactions.defer(interaction.id, interaction.token, {
-            flags: hide ? MessageFlags.Ephemeral : app.ephemeral
+            flags: hide !== undefined ? ( hide ? MessageFlags.Ephemeral : undefined) : app.ephemeral
         });
         const response = await fetch("https://thefact.space/random");
         const { text, source } = await response.json();

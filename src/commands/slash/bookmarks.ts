@@ -70,10 +70,7 @@ export default {
         if (!data) {
           return void (await app.api.interactions.reply(interaction.id, interaction.token, {
             content: "Invalid Keyword: No bookmarks found with that keyword",
-            flags: 
-    hide === undefined 
-        ? app.ephemeral 
-        : (hide ? MessageFlags.Ephemeral : undefined)
+            flags: app.ephemeral,
           }));
         }
         const embed = new EmbedBuilder()
@@ -86,10 +83,7 @@ export default {
         await app.api.interactions.reply(interaction.id, interaction.token, {
           embeds: [embed.toJSON()],
           components: [buttons.toJSON()],
-          flags: 
-    hide === undefined 
-        ? app.ephemeral 
-        : (hide ? MessageFlags.Ephemeral : undefined)
+          flags: hide ? MessageFlags.Ephemeral : app.ephemeral,
         });
         break;
       }
@@ -117,10 +111,7 @@ export default {
         app.api.interactions.reply(interaction.id, interaction.token, {
           embeds: [embed],
           components: [buttons],
-          flags: 
-    hide === undefined 
-        ? app.ephemeral 
-        : (hide ? MessageFlags.Ephemeral : undefined)
+          flags: app.ephemeral,
         });
         const collector = new app.collector(app, {
           filter: (init) =>
@@ -138,10 +129,7 @@ export default {
                 content: "Bookmark Deleted",
                 embeds: [],
                 components: [],
-                flags: 
-    hide === undefined 
-        ? app.ephemeral 
-        : (hide ? MessageFlags.Ephemeral : undefined)
+                flags: app.ephemeral,
               });
               break;
             }

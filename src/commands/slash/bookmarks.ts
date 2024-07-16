@@ -55,6 +55,7 @@ export default {
   async run(app, interaction, options) {
     const value = options.getString("keyword");
     const sub = options.getSubcommand();
+    const hide = options.getBoolean("hide");
     if (!value || value === "null") {
       return void (await app.api.interactions.reply(interaction.id, interaction.token, {
         content: "Invalid Keyword: No bookmarks found with that keyword",
@@ -66,7 +67,7 @@ export default {
                     : undefined
       }));
     }
-    const hide = options.getBoolean("hide");
+    
     const userId = interaction.user?.id ?? interaction.member!.user.id;
     const parsed: Bookmarks = toml.parse(fs.readFileSync("bookmarks.toml", "utf8"));
     switch (sub) {
@@ -85,7 +86,7 @@ export default {
         }
         const embed = new EmbedBuilder()
           .setTitle(`${data.username} Message`)
-          .setDescription(`${data.content}`)
+          .setDescription(`${data.content || "No Desc"}`)
           .setFooter({ text: `Requested by ${interaction.member?.user.id ?? interaction.user!.id}` });
         const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Link").setURL(data.url),

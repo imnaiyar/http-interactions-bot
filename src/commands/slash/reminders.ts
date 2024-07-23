@@ -95,7 +95,10 @@ export default {
     }
     let dmChannel = app.channels.get(interaction.user?.id ?? interaction.member!.user.id);
     if (!dmChannel) {
-      dmChannel = await app.api.users.createDM(interaction.user?.id ?? interaction.member!.user.id);
+      dmChannel = await app.api.users.createDM(interaction.user?.id ?? interaction.member!.user.id).then((c) => {
+        app.channels.set(interaction.user?.id ?? interaction.member!.user.id, c);
+        return c;
+      });
     }
     if (!dmChannel) throw new Error("Could not find or create DM channel");
     reminders[interaction.id] = {

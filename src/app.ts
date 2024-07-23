@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express, { type Response } from "express";
 import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions";
-import { loadContext, loadSlash, validate } from "#handlers";
+import { handleReminders, loadContext, loadSlash, validate } from "#handlers";
 import { EventEmitter } from "node:events";
 import { REST } from "@discordjs/rest";
 import config from "#src/config";
@@ -15,18 +15,20 @@ import {
   type APIChatInputApplicationCommandInteraction,
   type APIContextMenuInteraction,
   MessageFlags,
+  type APIChannel,
+  type APIDMChannel,
 } from "@discordjs/core/http-only";
 import { Collection } from "@discordjs/collection";
 import type { ContextMenu, SlashCommand } from "#structures";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 import { Collector } from "#src/utils/index";
-
 export default new (class App extends EventEmitter {
   public server = express();
   public slash: Collection<string, SlashCommand> = new Collection();
   public contexts: Collection<string, ContextMenu<"User" | "Message">> = new Collection();
   public collector = Collector;
   public config = config;
+  public channels = new Collection<string, APIChannel | APIDMChannel>();
   public api = new API(new REST().setToken(process.env.TOKEN!));
   public ephemeral: MessageFlags | undefined = MessageFlags.Ephemeral;
   constructor() {
@@ -54,8 +56,11 @@ export default new (class App extends EventEmitter {
     });
     this.server.listen(this.config.PORT, () => {
       console.log(`Server is running on port ${this.config.PORT}`);
-      this.api.users.get(process.env.CLIENT_ID!).then((u) => console.log("Logged in as " + u.username))
+      this.api.users.get(process.env.CLIENT_ID!).then((u) => console.log("Logged in as " + u.username));
     });
+    setInterval(() => {
+      handleReminders(this);
+    }, 1_000);
   }
   async handleApplication(interaction: APIApplicationCommandInteraction) {
     // @ts-ignore

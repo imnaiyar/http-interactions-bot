@@ -93,15 +93,10 @@ export default {
       const tomlString = fs.readFileSync("reminders.toml", "utf8");
       reminders = toml.parse(tomlString);
     }
-    const dmChannel =
-      app.channels.get(interaction.user?.id ?? interaction.member!.user.id) ||
-      (await app.api.users
-        .createDM(interaction.user?.id ?? interaction.member!.user.id)
-        .then((c) => {
-          app.channels.set(interaction.user?.id ?? interaction.member!.user.id, c);
-          return c;
-        })
-        .catch(console.error));
+    let dmChannel = app.channels.get(interaction.user?.id ?? interaction.member!.user.id);
+    if (!dmChannel) {
+      dmChannel = await app.api.users.createDM(interaction.user?.id ?? interaction.member!.user.id);
+    }
     if (!dmChannel) throw new Error("Could not find or create DM channel");
     reminders[interaction.id] = {
       authorId: interaction.user?.id ?? interaction.member!.user.id,

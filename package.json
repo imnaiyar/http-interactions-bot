@@ -1,5 +1,6 @@
 {
   "name": "http-bot",
+  "version": "1.0.0",
   "module": "app.ts",
   "type": "module",
   "main": "./dist/app.js",
@@ -70,3 +71,4 @@
     "@sapphire/type"
   ]
 }
+

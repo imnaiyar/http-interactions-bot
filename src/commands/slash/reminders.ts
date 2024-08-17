@@ -1,5 +1,5 @@
 import { ContextType, IntegrationType, type SlashCommand } from "#structures";
-import { ApplicationCommandOptionType } from "@discordjs/core/http-only";
+import { ApplicationCommandOptionType, ChannelType } from "@discordjs/core/http-only";
 import { EmbedBuilder, time } from "@discordjs/builders";
 import fs from "node:fs";
 import toml from "toml";
@@ -61,6 +61,7 @@ export default {
   },
   async run(app, interaction, options) {
     await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
+    const user = interaction.user || interaction.member?.user;
     const text = options.getString("text", true);
     const months = options.getInteger("months", false);
     const days = options.getInteger("days", false);
@@ -68,8 +69,13 @@ export default {
     const minutes = options.getInteger("minutes", false);
     const seconds = options.getInteger("seconds", false);
     if (!months && !days && !hours && !minutes && !seconds) {
-      return void (await app.api.interactions.editReply(interaction.id, interaction.token, {
+      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
         content: "You must provide at least one time options.",
+      }));
+    }
+    if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => (v.id = user!.id))) {
+      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+        content: "You can only use this command in my DMs",
       }));
     }
     const dur =
@@ -93,21 +99,14 @@ export default {
       const tomlString = fs.readFileSync("reminders.toml", "utf8");
       reminders = toml.parse(tomlString);
     }
-    let dmChannel = app.channels.get(interaction.user?.id ?? interaction.member!.user.id);
-    if (!dmChannel) {
-      dmChannel = await app.api.users.createDM(interaction.user?.id ?? interaction.member!.user.id).then((c) => {
-        app.channels.set(interaction.user?.id ?? interaction.member!.user.id, c);
-        return c;
-      });
-    }
-    if (!dmChannel) throw new Error("Could not find or create DM channel");
+
     reminders[interaction.id] = {
       authorId: interaction.user?.id ?? interaction.member!.user.id,
       text,
       time: dur,
-      username: interaction.user?.id ?? interaction.member!.user.id,
+      username: user!.username,
       setAt: Date.now(),
-      dmId: dmChannel.id,
+      dmId: interaction.channel.id,
     };
     fs.writeFileSync("reminders.toml", tomlify(reminders, { delims: false }));
     await app.api.interactions.editReply(interaction.application_id, interaction.token, {
@@ -128,3 +127,4 @@ export interface Reminder {
   setAt: number;
   dmId: string;
 }
+

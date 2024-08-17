@@ -73,7 +73,7 @@ export default {
         content: "You must provide at least one time options.",
       }));
     }
-    if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => (v.id = user!.id))) {
+    if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => v.id === user!.id)) {
       return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
         content: "You can only use this command in my DMs",
       }));

@@ -59,15 +59,10 @@ export default {
     if (!value || value === "null") {
       return void (await app.api.interactions.reply(interaction.id, interaction.token, {
         content: "Invalid Keyword: No bookmarks found with that keyword",
-        flags:
-                hide === null
-                    ? app.ephemeral
-                    : hide
-                    ? MessageFlags.Ephemeral
-                    : undefined
+        flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
       }));
     }
-    
+
     const userId = interaction.user?.id ?? interaction.member!.user.id;
     const parsed: Bookmarks = toml.parse(fs.readFileSync("bookmarks.toml", "utf8"));
     switch (sub) {
@@ -76,12 +71,7 @@ export default {
         if (!data) {
           return void (await app.api.interactions.reply(interaction.id, interaction.token, {
             content: "Invalid Keyword: No bookmarks found with that keyword",
-            flags:
-                hide === null
-                    ? app.ephemeral
-                    : hide
-                    ? MessageFlags.Ephemeral
-                    : undefined
+            flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
           }));
         }
         const embed = new EmbedBuilder()
@@ -94,12 +84,7 @@ export default {
         await app.api.interactions.reply(interaction.id, interaction.token, {
           embeds: [embed.toJSON()],
           components: [buttons.toJSON()],
-          flags:
-                hide === null
-                    ? app.ephemeral
-                    : hide
-                    ? MessageFlags.Ephemeral
-                    : undefined
+          flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
         });
         break;
       }
@@ -127,12 +112,7 @@ export default {
         app.api.interactions.reply(interaction.id, interaction.token, {
           embeds: [embed],
           components: [buttons],
-          flags:
-                hide === null
-                    ? app.ephemeral
-                    : hide
-                    ? MessageFlags.Ephemeral
-                    : undefined
+          flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
         });
         const collector = new app.collector(app, {
           filter: (init) =>

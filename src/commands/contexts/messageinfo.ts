@@ -12,7 +12,7 @@ export default {
   async run(app, interaction, options) {
     const target = options.getTargetMessage();
     await app.api.interactions.reply(interaction.id, interaction.token, {
-      content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", targetMessage).slice(0, 1990)}\`\`\``,
+      content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", target).slice(0, 1990)}\`\`\``,
       flags: app.ephemeral,
     });
   },

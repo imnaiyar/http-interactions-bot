@@ -95,7 +95,7 @@ const buildSuccessResponse = async (output: any, time: string, haste: boolean, d
     .setDescription(`**Input**\n\n` + codeBlock(input) + "\n**Output**\n\n" + embOutput)
     .setColor(0x2c9438)
     .setFooter({
-      text: `⏱️ Took ${time}`,
+      text: `⏱️ Took ${time} | Type "${typeof output}"`,
     })
     .setTimestamp(Date.now());
 

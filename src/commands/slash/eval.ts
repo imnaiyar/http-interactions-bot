@@ -79,8 +79,8 @@ export default {
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
   // Token protection
-  output = util
-    .inspect(output, { depth: depth })
+  output = (typeof output === "string" ? output : util
+    .inspect(output, { depth: depth }))
     .replaceAll(process.env.TOKEN!, "~~REDACTED~~")
     .replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED--'");
   let embOutput;

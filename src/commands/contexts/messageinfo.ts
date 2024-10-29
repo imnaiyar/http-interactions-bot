@@ -1,5 +1,6 @@
 import { formatUserInfo } from "#utils";
 import type { ContextMenu } from "#structures";
+import { postToHaste } from "#src/utils/index";
 import { ApplicationCommandType } from "@discordjs/core/http-only";
 import { formatWithOptions } from "node:util";
 export default {
@@ -11,9 +12,16 @@ export default {
   },
   async run(app, interaction, options) {
     const target = options.getTargetMessage();
-    await app.api.interactions.reply(interaction.id, interaction.token, {
-      content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", target).slice(0, 1990)}\`\`\``,
-      flags: app.ephemeral,
+    await app.api.interactions.defer(interaction.id, interaction.token, {
+      flags: app.ephemeral
+    });
+    const formatted = formatWithOptions({ depth: 5 }, "%O", target);
+    let toRespond = `\`\`\`js\n${formatted}\`\`\``
+    if (formatted.length >= 2000) {
+      toRespond = await postToHaste(formatted);
+    }
+    await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+      content: toRespond,
     });
   },
 } satisfies ContextMenu<"Message">;

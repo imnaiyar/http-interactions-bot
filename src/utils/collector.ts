@@ -1,29 +1,56 @@
-import { type APIInteraction, type APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
+import {
+  type APIInteraction,
+  type APIMessageComponentInteraction,
+  type APIModalSubmitInteraction,
+  InteractionType,
+} from "@discordjs/core/http-only";
 import { EventEmitter } from "node:events";
 import type App from "#src/app";
 
-interface CollectorOptions {
-  filter?: (int: APIMessageComponentInteraction) => boolean;
+interface CollectorOptions<T extends InteractionType.MessageComponent | InteractionType.ModalSubmit> {
+  filter?: (
+    int: T extends InteractionType.MessageComponent ? APIMessageComponentInteraction : APIModalSubmitInteraction,
+  ) => boolean;
   max?: number;
   timeout?: number;
   idle?: number;
+  type?: T;
 }
-declare interface Collector {
-  on(event: "collect", listener: (args: APIMessageComponentInteraction) => any): this;
-  on(event: "end", listener: (args: APIMessageComponentInteraction[], reason: string) => any): this;
+declare interface Collector<
+  T extends InteractionType.MessageComponent | InteractionType.ModalSubmit = InteractionType.MessageComponent,
+> {
+  on(
+    event: "collect",
+    listener: (
+      args: T extends InteractionType.MessageComponent ? APIMessageComponentInteraction : APIModalSubmitInteraction,
+    ) => any,
+  ): this;
+  on(
+    event: "end",
+    listener: (
+      args: T extends InteractionType.MessageComponent ? APIMessageComponentInteraction[] : APIModalSubmitInteraction[],
+      reason: string,
+    ) => any,
+  ): this;
 }
 
-class Collector extends EventEmitter {
-  private collected: APIMessageComponentInteraction[] = [];
+class Collector<
+  T extends InteractionType.MessageComponent | InteractionType.ModalSubmit = InteractionType.MessageComponent,
+> extends EventEmitter {
+  private collected: (APIMessageComponentInteraction | APIModalSubmitInteraction)[] = [];
   private timer: Timer | undefined;
-  private filter: (int: APIMessageComponentInteraction) => boolean;
+  private type: T;
+  private filter: (int: APIMessageComponentInteraction | APIModalSubmitInteraction) => boolean;
 
   public constructor(
     private app: typeof App,
-    private options: CollectorOptions = {},
+    private options: CollectorOptions<T> = {},
   ) {
     super();
+    // @ts-ignore I do not have the patience to fix this type gymnastic, sorry lol
     this.filter = options.filter ?? (() => true);
+    if (options.type) this.type = options.type;
+    else this.type = InteractionType.MessageComponent as T;
     this.timer = options.timeout
       ? setTimeout(() => this.end("timeout"), options.timeout)
       : options.idle
@@ -35,7 +62,7 @@ class Collector extends EventEmitter {
   }
 
   private listener(int: APIInteraction) {
-    if (int.type !== InteractionType.MessageComponent) return;
+    if (int.type !== this.type) return;
 
     const passesFilter = this.filter(int);
 
@@ -46,7 +73,6 @@ class Collector extends EventEmitter {
     this.collected.push(int);
     if (this.options.idle) {
       clearTimeout(this.timer);
-      console.log("collector reset");
       this.timer = setTimeout(() => this.end("timeout"), this.options.idle);
     }
 

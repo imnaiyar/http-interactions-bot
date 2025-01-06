@@ -66,7 +66,7 @@ export default {
     // Navigate to the provided URL
     await page.goto(url);
     
-    if (waitFor) await Bun.sleep(waitFor);
+    if (waitFor) await Bun.sleep(waitFor * 1000);
     
     // Take a screenshot
     const screenshotBuffer = await page.screenshot();

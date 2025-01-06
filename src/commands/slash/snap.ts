@@ -50,7 +50,7 @@ export default {
     await app.api.interactions.defer(interaction.id, interaction.token, {
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ flags: ["--no-sandbox"] });
     const page = await browser.newPage();
 
     // Set viewport size

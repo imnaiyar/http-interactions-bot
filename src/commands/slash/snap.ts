@@ -37,7 +37,7 @@ export default {
         name: "wait-for",
         description: "Wait for this number of seconds before taking a snap",
         type: ApplicationCommandOptionType.Number,
-        required: true,
+        required: false,
       },
     ],
     integration_types: [IntegrationType.Users],

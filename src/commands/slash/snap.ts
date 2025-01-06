@@ -9,6 +9,8 @@ const devicesDimensions: Record<string, { width: number; height: number; isMobil
   desktop: { width: 1280, height: 720 },
   "desktop-xs": { width: 1440, height: 900 },
 };
+
+// TODO: Handle puppeteer errors
 export default {
   data: {
     name: "snap",

@@ -33,6 +33,12 @@ export default {
           value: k,
         })),
       },
+       {
+        name: "wait-for",
+        description: "Wait for this number of seconds before taking a snap",
+        type: ApplicationCommandOptionType.Number,
+        required: true,
+      },
     ],
     integration_types: [IntegrationType.Users],
     contexts: [0, 1, 2],
@@ -41,6 +47,7 @@ export default {
     const hide = null;
     const url = options.getString("url", true);
     const viewport = options.getString("viewport");
+    const waitFor = options.getNumber("wait-for");
     if (!/^https?:\/\/.+/.test(url)) {
       return void (await app.api.interactions.reply(interaction.id, interaction.token, {
         content: "Not a valid url",
@@ -58,7 +65,9 @@ export default {
 
     // Navigate to the provided URL
     await page.goto(url);
-
+    
+    if (waitFor) await Bun.sleep(waitFor);
+    
     // Take a screenshot
     const screenshotBuffer = await page.screenshot();
 

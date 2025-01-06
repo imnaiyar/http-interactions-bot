@@ -61,7 +61,9 @@ export default {
     });
     const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
     const page = await browser.newPage();
-
+    
+    await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
+    
     // Set viewport size
     await page.setViewport(viewport ? devicesDimensions[viewport] : { width: 1280, height: 720 });
 

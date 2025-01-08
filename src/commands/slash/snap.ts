@@ -47,7 +47,7 @@ export default {
     contexts: [0, 1, 2],
   },
   async run(app, interaction, options) {
-    const hide = options.getString("hide");
+    const hide = options.getBoolean("hide");
     const url = options.getString("url", true);
     const viewport = options.getString("viewport");
     const waitFor = options.getNumber("wait-for");

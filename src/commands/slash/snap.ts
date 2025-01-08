@@ -35,7 +35,7 @@ export default {
           value: k,
         })),
       },
-       {
+      {
         name: "wait-for",
         description: "Wait for this number of seconds before taking a snap",
         type: ApplicationCommandOptionType.Number,
@@ -59,24 +59,26 @@ export default {
     await app.api.interactions.defer(interaction.id, interaction.token, {
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
+    const start = performance.now();
     const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
     const page = await browser.newPage();
-    
-    await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
-    
+
+    await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
+
     // Set viewport size
     await page.setViewport(viewport ? devicesDimensions[viewport] : { width: 1280, height: 720 });
 
     // Navigate to the provided URL
     await page.goto(url);
-    
+
     if (waitFor) await Bun.sleep(waitFor * 1000);
-    
+
     // Take a screenshot
     const screenshotBuffer = await page.screenshot();
-
     await browser.close();
+    const end = performance.now();
     return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+      content: `Took: \`${((end - start) / 1000).toFixed(2)}s\``,
       files: [
         {
           name: "screenshot.png",

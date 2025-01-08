@@ -1,7 +1,7 @@
 import { EmbedBuilder, roleMention, time } from "@discordjs/builders";
 import { ImageFormat, type APIGuildMember, type APIInteraction, type APIUser } from "@discordjs/core/http-only";
-import { UserUtil as utils } from "#src/utils/index";
-import App from "#src/app";
+import { UserUtil as utils } from "@/utils";
+import App from "@/app";
 import { DiscordSnowflake } from "@sapphire/snowflake";
 
 export function formatUserInfo(

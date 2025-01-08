@@ -1,5 +1,5 @@
-import { formatUserInfo } from "#utils";
-import type { ContextMenu } from "#structures";
+import { formatUserInfo } from "@/utils";
+import type { ContextMenu } from "@/structures";
 import { ApplicationCommandType } from "@discordjs/core/http-only";
 export default {
   data: {

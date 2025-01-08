@@ -1,9 +1,9 @@
-import type { Reminders } from "#src/commands/slash/reminders";
+import type { Reminders } from "@/commands/slash/reminders";
 import toml from "toml";
 import fs from "node:fs";
 import tomlify from "tomlify";
 import { EmbedBuilder } from "@discordjs/builders";
-import App from "#src/app";
+import App from "@/app";
 export default async (app: typeof App) => {
   if (!fs.existsSync("reminders.toml")) return;
   const reminders: Reminders = toml.parse(fs.readFileSync("reminders.toml", "utf8"));

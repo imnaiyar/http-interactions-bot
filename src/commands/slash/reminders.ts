@@ -1,4 +1,4 @@
-import { ContextType, IntegrationType, type SlashCommand } from "#structures";
+import { ContextType, IntegrationType, type SlashCommand } from "@/structures";
 import { ApplicationCommandOptionType, ChannelType } from "@discordjs/core/http-only";
 import { EmbedBuilder, time } from "@discordjs/builders";
 import fs from "node:fs";

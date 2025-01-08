@@ -1,4 +1,4 @@
-import { ContextType, IntegrationType, type SlashCommand } from "#structures";
+import { ContextType, IntegrationType, type SlashCommand } from "@/structures";
 import { MessageFlags } from "@discordjs/core";
 import { ApplicationCommandOptionType } from "@discordjs/core/http-only";
 import { DiscordSnowflake as Snowflake } from "@sapphire/snowflake";

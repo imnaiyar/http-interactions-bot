@@ -1,10 +1,10 @@
 import "dotenv/config";
 import express, { type Response } from "express";
 import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions";
-import { handleReminders, loadContext, loadSlash, validate } from "#handlers";
+import { handleReminders, loadContext, loadSlash, validate } from "@/handlers";
 import { EventEmitter } from "node:events";
 import { REST } from "@discordjs/rest";
-import config from "#src/config";
+import config from "@/config";
 import {
   API,
   InteractionType,
@@ -19,9 +19,9 @@ import {
   type APIDMChannel,
 } from "@discordjs/core/http-only";
 import { Collection } from "@discordjs/collection";
-import type { ContextMenu, SlashCommand } from "#structures";
+import type { ContextMenu, SlashCommand } from "@/structures";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
-import { Collector } from "#src/utils/index";
+import { Collector } from "@/utils/index";
 export default new (class App extends EventEmitter {
   public server = express();
   public slash: Collection<string, SlashCommand> = new Collection();

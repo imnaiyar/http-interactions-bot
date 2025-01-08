@@ -1,7 +1,7 @@
-import type { ContextMenu } from "#structures";
+import type { ContextMenu } from "@/structures";
 import { ApplicationCommandType } from "@discordjs/core/http-only";
 import { format } from "prettier";
-import { truncate } from "#utils";
+import { truncate } from "@/utils";
 import { codeBlock } from "@discordjs/formatters";
 
 const NO_CODE_RESPONSE = {

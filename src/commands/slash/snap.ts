@@ -1,5 +1,5 @@
-import { IntegrationType } from "#src/structures/enums";
-import type { SlashCommand } from "#src/structures/SlashCommad";
+import { HIDE_OPTIONS } from "@/constants";
+import { IntegrationType, type SlashCommand } from "@/structures";
 import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
 import puppeteer from "puppeteer";
 const devicesDimensions: Record<string, { width: number; height: number; isMobile?: boolean; isLandscape?: boolean }> = {
@@ -41,6 +41,7 @@ export default {
         type: ApplicationCommandOptionType.Number,
         required: false,
       },
+      HIDE_OPTIONS,
     ],
     integration_types: [IntegrationType.Users],
     contexts: [0, 1, 2],

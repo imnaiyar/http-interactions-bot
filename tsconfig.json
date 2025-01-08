@@ -22,15 +22,7 @@
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false,
     "paths": {
-      "#handlers": ["./src/handlers/index"],
-      "#handlers/*": ["./src/handlers/*"],
-      "#src/*": ["./src/*"],
-      "#commands/*": ["./src/commands/*"],
-      "#root/*": ["./*"],
-      "#structures/*": ["./src/structures/*"],
-      "#structures": ["./src/structures/index"],
-      "#utils/*": ["./src/utils/*"],
-      "#utils": ["./src/utils/index"]
+      "@/*": ["./src/*"]
     }
   }
 }

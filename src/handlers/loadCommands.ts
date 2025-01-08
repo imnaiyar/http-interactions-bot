@@ -1,7 +1,7 @@
-import { recursiveReadDir } from "#src/utils/index";
+import { recursiveReadDir } from "@/utils";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
-import type { ContextMenu, SlashCommand } from "#structures";
+import type { ContextMenu, SlashCommand } from "@/structures";
 import { Collection } from "@discordjs/collection";
 export async function loadSlash(dirs: string) {
   const files = recursiveReadDir(dirs);

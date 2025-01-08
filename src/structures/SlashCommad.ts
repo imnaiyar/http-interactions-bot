@@ -3,8 +3,8 @@ import type {
   APIChatInputApplicationCommandInteraction,
   APIApplicationCommandAutocompleteInteraction,
 } from "@discordjs/core/http-only";
-import type { ContextType, IntegrationType } from "#structures";
-import App from "#src/app";
+import type { ContextType, IntegrationType } from "./index";
+import App from "@/app";
 import type { InteractionOptionResolver } from "@sapphire/discord-utilities";
 
 export interface SlashCommand<Autocomplete extends boolean = false> {

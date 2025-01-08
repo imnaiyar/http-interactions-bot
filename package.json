@@ -41,36 +41,8 @@
     "toml": "^3.0.0",
     "tomlify": "^0.2.2"
   },
-  "imports": {
-    "#handlers": [
-      "./dist/handlers/index.js"
-    ],
-    "#handlers/*": [
-      "./dist/handlers/*.js"
-    ],
-    "#src/*": [
-      "./dist/*.js"
-    ],
-    "#commands/*": [
-      "./dist/commands/*.js"
-    ],
-    "#root/*": [
-      "./*"
-    ],
-    "#structures/*": [
-      "./dist/structures/*.js"
-    ],
-    "#structures": [
-      "./dist/structures/index.js"
-    ],
-    "#utils/*": [
-      "./dist/utils/*.js"
-    ],
-    "#utils": [
-      "./dist/utils/index.js"
-    ]
-  },
   "trustedDependencies": [
     "@sapphire/type"
   ]
 }
+

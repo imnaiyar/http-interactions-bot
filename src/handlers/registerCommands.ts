@@ -1,6 +1,6 @@
-import { loadContext, loadSlash } from "#handlers/loadCommands";
+import { loadContext, loadSlash } from "@/handlers";
 import { REST } from "@discordjs/rest";
-import type { ContextMenu, SlashCommand } from "#structures";
+import type { ContextMenu, SlashCommand } from "@/structures";
 import { Routes } from "@discordjs/core/http-only";
 
 const contexts = await loadContext("src/commands/contexts");

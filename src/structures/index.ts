@@ -1,3 +1,3 @@
-export * from "#structures/SlashCommad";
-export * from "#structures/ContextMenu";
-export * from "#structures/enums";
+export * from "./SlashCommad";
+export * from "./ContextMenu";
+export * from "./enums";

@@ -1,5 +1,4 @@
-import type { ContextMenu } from "#src/structures/ContextMenu";
-import { IntegrationType } from "#src/structures/enums";
+import { IntegrationType, type ContextMenu } from "@/structures";
 import { ApplicationCommandType, type APIEmbed } from "@discordjs/core";
 import { translate } from "@vitalets/google-translate-api";
 import ISO6391 from "iso-639-1";

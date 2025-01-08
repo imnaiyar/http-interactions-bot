@@ -1,4 +1,4 @@
-import { ContextType, IntegrationType, type ContextMenu } from "#structures";
+import { ContextType, IntegrationType, type ContextMenu } from "@/structures";
 import { ApplicationCommandType } from "@discordjs/core/http-only";
 import fs from "node:fs";
 import toml from "toml";

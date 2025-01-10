@@ -3,7 +3,7 @@ import express, { type Response } from "express";
 import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions";
 import { handleReminders, loadContext, loadSlash, validate } from "@/handlers";
 import { EventEmitter } from "node:events";
-import { REST } from "@discordjs/rest";
+import { REST, type RawFile } from "@discordjs/rest";
 import config from "@/config";
 import {
   API,
@@ -17,11 +17,17 @@ import {
   MessageFlags,
   type APIChannel,
   type APIDMChannel,
+  type APIPingInteraction,
+  type APIInteractionResponseCallbackData,
+  type Snowflake,
+  type APIMessageComponentInteraction,
+  type APIModalSubmitInteraction,
 } from "@discordjs/core/http-only";
 import { Collection } from "@discordjs/collection";
 import type { ContextMenu, SlashCommand } from "@/structures";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 import { Collector } from "@/utils/index";
+type RepliableInteractions = Exclude<APIInteraction, APIApplicationCommandAutocompleteInteraction | APIPingInteraction>;
 export default new (class App extends EventEmitter {
   public server = express();
   public slash: Collection<string, SlashCommand> = new Collection();
@@ -53,6 +59,16 @@ export default new (class App extends EventEmitter {
       if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
         return await this.handleAutocomplete(interaction as APIApplicationCommandAutocompleteInteraction, res);
       }
+      if (interaction.type === InteractionType.MessageComponent) {
+        const userId = interaction.data.custom_id.split(";")[1];
+        if (!userId) return;
+        if (userId !== (interaction.member?.user || interaction.user!).id) {
+          return this.reply(interaction, {
+            content: "This is not your interaction. Nice try tho Haha!!",
+            flags: 64,
+          });
+        }
+      }
     });
     this.server.listen(this.config.PORT, () => {
       console.log(`Server is running on port ${this.config.PORT}`);
@@ -62,7 +78,7 @@ export default new (class App extends EventEmitter {
       handleReminders(this);
     }, 1_000);
   }
-  async handleApplication(interaction: APIApplicationCommandInteraction) {
+  private async handleApplication(interaction: APIApplicationCommandInteraction) {
     // @ts-ignore
     const options = new InteractionOptionResolver(interaction);
     if (interaction.data.type === ApplicationCommandType.ChatInput) {
@@ -87,7 +103,7 @@ export default new (class App extends EventEmitter {
       }
     }
   }
-  async handleAutocomplete(interaction: APIApplicationCommandAutocompleteInteraction, res: Response) {
+  private async handleAutocomplete(interaction: APIApplicationCommandAutocompleteInteraction, res: Response) {
     const command = this.slash.get(interaction.data.name) as unknown as SlashCommand<true>;
     if (!command) {
       res.send({
@@ -103,6 +119,38 @@ export default new (class App extends EventEmitter {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  /** Reply to the given interaction */
+  public reply(interaction: RepliableInteractions, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
+    return this.api.interactions.reply(interaction.id, interaction.token, data);
+  }
+
+  /** Edit the reply to the given interaction */
+  public editReply(
+    interaction: RepliableInteractions,
+    data: APIInteractionResponseCallbackData & { files?: RawFile[] },
+    messageId: Snowflake = "@original",
+  ) {
+    return this.api.interactions.editReply(interaction.application_id, interaction.token, data, messageId);
+  }
+
+  /** Update this interactions Message */
+  public update(
+    interaction: APIMessageComponentInteraction | APIModalSubmitInteraction,
+    data: APIInteractionResponseCallbackData & { files?: RawFile[] },
+  ) {
+    return this.api.interactions.updateMessage(interaction.id, interaction.token, data);
+  }
+
+  /** Delete the reply to this interaction */
+  public deleteReply(interaction: RepliableInteractions, messageId: Snowflake = "@original") {
+    return this.api.interactions.deleteReply(interaction.application_id, interaction.token, messageId);
+  }
+
+  /** Create a follow up response to this interaction */
+  public followUp(interaction: RepliableInteractions, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
+    return this.api.interactions.followUp(interaction.application_id, interaction.token, data);
   }
 })();
 

@@ -112,7 +112,7 @@ export default {
             ? new ActionRowBuilder<StringSelectMenuBuilder>()
                 .addComponents(
                   new StringSelectMenuBuilder()
-                    .setCustomId("mark_todo_complete")
+                    .setCustomId("mark_todo_complete" + `;${userId}`)
                     .setPlaceholder("Mark Completed")
                     .setMinValues(0)
                     .setMaxValues(list.length)
@@ -129,12 +129,12 @@ export default {
           const btns = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
               new ButtonBuilder()
-                .setCustomId("todo_prev")
+                .setCustomId("todo_prev" + `;${userId}`)
                 .setLabel("Prev")
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(index <= 0),
               new ButtonBuilder()
-                .setCustomId("todo_next")
+                .setCustomId("todo_next" + `;${userId}`)
                 .setLabel("Next")
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(index + 5 >= total),
@@ -142,19 +142,21 @@ export default {
             .toJSON();
           return { embeds: [embed], components: row ? [row, btns] : [btns] };
         };
-        await app.api.interactions.reply(interaction.id, interaction.token, {
+        await app.reply(interaction, {
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
           ...getList(),
         });
         const collector = new app.collector(app, {
           idle: 60_000,
+          filter: (i) => (i.user?.id || i.member!.user.id) === userId,
         });
         collector.on("collect", async (int) => {
-          if (int.data.custom_id === "todo_next") {
+          const custom_id = int.data.custom_id.split(";")[0];
+          if (custom_id === "todo_next") {
             index >= total ? (index = total - 1) : (index += 5);
-          } else if (int.data.custom_id === "todo_prev") {
+          } else if (custom_id === "todo_prev") {
             index <= 0 ? (index = 0) : (index -= 5);
-          } else if (int.data.component_type === ComponentType.StringSelect && int.data.custom_id === "mark_todo_complete") {
+          } else if (int.data.component_type === ComponentType.StringSelect && custom_id === "mark_todo_complete") {
             const values = int.data.values;
             for (const [k] of arr.slice(index, index + 5)) {
               if (values.includes(k)) {
@@ -167,7 +169,7 @@ export default {
             }
             fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false }));
           }
-          await app.api.interactions.updateMessage(int.id, int.token, {
+          await app.update(int, {
             ...getList(),
           });
         });
@@ -183,7 +185,7 @@ export default {
         }
         delete parsed[userId][keyword];
         fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false }));
-        return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+        return void (await app.reply(interaction, {
           content: "Deleted TODO",
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
         }));
@@ -198,7 +200,7 @@ export default {
         };
         parsed[userId] = { ...parsed[userId], [Math.random().toString(36).slice(2)]: todo };
         fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false }));
-        return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+        return void (await app.reply(interaction, {
           embeds: [
             {
               author: { name: "Created TODO!" },

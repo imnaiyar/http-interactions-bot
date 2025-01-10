@@ -104,8 +104,14 @@ export default {
           .toJSON();
         const buttons = new ActionRowBuilder<ButtonBuilder>()
           .addComponents(
-            new ButtonBuilder().setCustomId("yes").setLabel("Yes").setStyle(ButtonStyle.Danger),
-            new ButtonBuilder().setCustomId("no").setLabel("No").setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+              .setCustomId("yes" + `;${(interaction.member?.user || interaction.user!).id}`)
+              .setLabel("Yes")
+              .setStyle(ButtonStyle.Danger),
+            new ButtonBuilder()
+              .setCustomId("no" + `;${(interaction.member?.user || interaction.user!).id}`)
+              .setLabel("No")
+              .setStyle(ButtonStyle.Success),
             new ButtonBuilder().setLabel("Message Link").setStyle(ButtonStyle.Link).setURL(parsed[userId][value].url),
           )
           .toJSON();
@@ -116,17 +122,18 @@ export default {
         });
         const collector = new app.collector(app, {
           filter: (init) =>
-            ((init.user?.id ?? init.member!.user.id) === userId && init.data.custom_id === "yes") || init.data.custom_id === "no",
+            (init.user?.id ?? init.member!.user.id) === userId &&
+            (init.data.custom_id.startsWith("yes") || init.data.custom_id.startsWith("no")),
           timeout: 60_000,
           max: 1,
         });
         collector.on("collect", async (int) => {
-          const id = int.data.custom_id;
+          const id = int.data.custom_id.split(";")[0];
           switch (id) {
             case "yes": {
               delete parsed[userId][value];
               fs.writeFileSync("bookmarks.toml", tomlify(parsed, { delims: false }));
-              app.api.interactions.updateMessage(int.id, int.token, {
+              app.update(int, {
                 content: "Bookmark Deleted",
                 embeds: [],
                 components: [],
@@ -134,7 +141,7 @@ export default {
               break;
             }
             case "no": {
-              app.api.interactions.updateMessage(int.id, int.token, {
+              app.update(int, {
                 content: "Canceled deletion",
                 components: [],
               });

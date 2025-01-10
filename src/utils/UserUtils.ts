@@ -1,5 +1,5 @@
 import { type APIGuildMember, type APIUser, type UserAvatarFormat, type UserBannerFormat } from "@discordjs/core/http-only";
-import App from "#src/app";
+import App from "@/app";
 import { calculateUserDefaultAvatarIndex } from "@discordjs/rest";
 
 export class UserUtil {

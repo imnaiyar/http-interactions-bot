@@ -5,7 +5,7 @@ import {
   InteractionType,
 } from "@discordjs/core/http-only";
 import { EventEmitter } from "node:events";
-import type App from "#src/app";
+import type App from "@/app";
 
 interface CollectorOptions<T extends InteractionType.MessageComponent | InteractionType.ModalSubmit> {
   filter?: (

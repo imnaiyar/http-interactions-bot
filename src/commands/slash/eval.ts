@@ -123,7 +123,7 @@ const buildSuccessResponse = async (output: any, time: string, haste: boolean, d
     })
     .setTimestamp(Date.now());
 
-  return { embeds: [embed.toJSON()] };
+  return { embeds: [embed.toJSON() as any] };
 };
 
 const buildErrorResponse = (err: any) => {
@@ -133,5 +133,5 @@ const buildErrorResponse = (err: any) => {
     .setColor(0xff0000)
     .setTimestamp();
 
-  return { embeds: [embed.toJSON()] };
+  return { embeds: [embed.toJSON() as any] };
 };

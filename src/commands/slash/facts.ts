@@ -23,7 +23,7 @@ export default {
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
     const response = await fetch("https://thefact.space/random");
-    const { text, source } = await response.json();
+    const { text, source } = await response.json() as { text: string; source: string };
     await app.api.interactions.editReply(interaction.application_id, interaction.token, {
       content: `**Random Fact**\n> ${text}\n-# [Source](<${source}>)`,
     });

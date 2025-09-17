@@ -110,7 +110,7 @@ export default {
     };
     fs.writeFileSync("reminders.toml", tomlify(reminders, { delims: false }));
     await app.api.interactions.editReply(interaction.application_id, interaction.token, {
-      embeds: [embed.toJSON()],
+      embeds: [embed.toJSON() as any],
       flags: app.ephemeral,
     });
   },

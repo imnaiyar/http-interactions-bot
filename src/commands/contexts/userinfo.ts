@@ -16,7 +16,7 @@ export default {
     const member = interaction.guild_id && (await app.api.guilds.getMember(interaction.guild_id, message.author.id).catch(() => {}))
     const embed = formatUserInfo((member && member) || undefined, targetUser, interaction, app);
     await app.api.interactions.editReply(interaction.application_id, interaction.token, {
-      embeds: [embed.toJSON()],
+      embeds: [embed.toJSON() as any],
       flags: app.ephemeral,
     });
   },

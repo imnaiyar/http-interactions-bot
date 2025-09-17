@@ -18,6 +18,7 @@ import { Collection } from '@discordjs/collection';
 import { REST, type RawFile } from '@discordjs/rest';
 import { InteractionOptionResolver } from '@sapphire/discord-utilities';
 import { InteractionResponseType } from 'discord-interactions';
+import { EventEmitter } from 'node:events';
 
 import type { ContextMenu, SlashCommand } from '@/structures';
 import { loadSlash, loadContext, validate } from '@/handlers';
@@ -28,7 +29,7 @@ import type { Env } from './index';
 
 type RepliableInteractions = Exclude<APIInteraction, APIApplicationCommandAutocompleteInteraction>;
 
-export class Bot {
+export class Bot extends EventEmitter {
   public slash: Collection<string, SlashCommand> = new Collection();
   public contexts: Collection<string, ContextMenu<'User' | 'Message'>> = new Collection();
   public collector = Collector;
@@ -39,6 +40,7 @@ export class Bot {
   private env: Env;
 
   constructor(env: Env) {
+    super();
     this.env = env;
     this.api = new API(new REST().setToken(env.DISCORD_TOKEN));
     this.init();

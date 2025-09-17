@@ -1,8 +1,6 @@
-import type { Reminders } from "@/commands/slash/reminders";
-import { EmbedBuilder } from "@discordjs/builders";
 import type { Bot } from "@/bot";
 
-export default async (app: Bot) => {
+export default async (_app: Bot) => {
   // For now, reminders functionality is disabled in Workers
   // TODO: Implement KV storage for reminders
   // const kv = app.env.REMINDERS;
@@ -41,7 +39,7 @@ export default async (app: Bot) => {
 
       await app.api.channels
         .createMessage(dmId, {
-          embeds: [embed.toJSON()],
+          embeds: [embed.toJSON() as any],
         })
         .catch(console.error);
     }

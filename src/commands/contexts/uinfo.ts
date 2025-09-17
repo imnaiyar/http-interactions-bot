@@ -13,9 +13,9 @@ export default {
     const targetUser = await app.api.users.get(interaction.data.target_id);
     const member = options.getTargetMember();
     // prettier-ignore
-    const embed = formatUserInfo( member ?? undefined , targetUser, interaction, app);
+    const embed = formatUserInfo( member ?? undefined as any , targetUser, interaction, app);
     await app.api.interactions.editReply(interaction.application_id, interaction.token, {
-      embeds: [embed.toJSON()],
+      embeds: [embed.toJSON() as any],
       flags: app.ephemeral,
     });
   },

@@ -1,5 +1,5 @@
 import { type APIGuildMember, type APIUser, type UserAvatarFormat, type UserBannerFormat } from "@discordjs/core/http-only";
-import App from "@/app";
+import { type Bot } from "@/bot";
 import { calculateUserDefaultAvatarIndex } from "@discordjs/rest";
 
 export class UserUtil {
@@ -8,7 +8,7 @@ export class UserUtil {
    * @param user API User
    * @param [format = ImageFormat.PNG] Image format
    */
-  public static userAvatarURL(app: typeof App, user: APIUser, format?: UserAvatarFormat) {
+  public static userAvatarURL(app: Bot, user: APIUser, format?: UserAvatarFormat) {
     return (
       (user.avatar && app.api.rest.cdn.avatar(user.id, user.avatar, format && { extension: format })) ||
       UserUtil.defaultAvatarURL(app, user)
@@ -19,7 +19,7 @@ export class UserUtil {
    * Get User Default Avatar
    * @param user The APIUser
    */
-  public static defaultAvatarURL(app: typeof App, user: APIUser) {
+  public static defaultAvatarURL(app: Bot, user: APIUser) {
     const index = user.discriminator === "0" ? calculateUserDefaultAvatarIndex(user.id) : parseInt(user.discriminator) % 5;
     return app.api.rest.cdn.defaultAvatar(index);
   }
@@ -31,7 +31,7 @@ export class UserUtil {
    * @param format
    */
   public static memberAvatarURL(
-    app: typeof App,
+    app: Bot,
     member: APIGuildMember | Omit<APIGuildMember, "deaf" | "mute">,
     userId: string,
     guildId: string,
@@ -44,7 +44,7 @@ export class UserUtil {
   /**
    * Return GuildMember Banner
    */
-  public static bannerURL(app: typeof App, user: APIUser, format?: UserBannerFormat) {
+  public static bannerURL(app: Bot, user: APIUser, format?: UserBannerFormat) {
     return user.banner && app.api.rest.cdn.banner(user.id, user.banner, format && { extension: format });
   }
 }

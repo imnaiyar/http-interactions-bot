@@ -82,8 +82,8 @@ export default {
           new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Link").setURL(data.url),
         );
         await app.api.interactions.reply(interaction.id, interaction.token, {
-          embeds: [embed.toJSON()],
-          components: [buttons.toJSON()],
+          embeds: [embed.toJSON() as any],
+          components: [buttons.toJSON() as any],
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
         });
         break;
@@ -116,8 +116,8 @@ export default {
           )
           .toJSON();
         app.api.interactions.reply(interaction.id, interaction.token, {
-          embeds: [embed],
-          components: [buttons],
+          embeds: [embed as any],
+          components: [buttons as any],
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
         });
         const collector = new app.collector(app, {

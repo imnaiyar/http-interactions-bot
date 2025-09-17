@@ -140,7 +140,7 @@ export default {
                 .setDisabled(index + 5 >= total),
             )
             .toJSON();
-          return { embeds: [embed], components: row ? [row, btns] : [btns] };
+          return { embeds: [embed as any], components: row ? [row as any, btns as any] : [btns as any] };
         };
         await app.reply(interaction, {
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,

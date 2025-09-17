@@ -207,7 +207,7 @@ export default {
                   .join("\n")}`,
               )
               .setColor(4203516)
-              .toJSON(),
+              .toJSON() as any,
           ],
           flags: app.ephemeral,
         });
@@ -241,7 +241,7 @@ export default {
                 ].join("\n"),
               },
             )
-            .toJSON(),
+            .toJSON() as any,
         ],
         flags: app.ephemeral,
       });
@@ -321,7 +321,7 @@ export default {
               inline: true,
             },
           )
-          .toJSON(),
+          .toJSON() as any,
       ],
       flags: app.ephemeral,
     });

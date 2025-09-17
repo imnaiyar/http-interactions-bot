@@ -1,14 +1,14 @@
 import { EmbedBuilder, roleMention, time } from "@discordjs/builders";
 import { ImageFormat, type APIGuildMember, type APIInteraction, type APIUser } from "@discordjs/core/http-only";
 import { UserUtil as utils } from "@/utils";
-import App from "@/app";
+import { type Bot } from "@/bot";
 import { DiscordSnowflake } from "@sapphire/snowflake";
 
 export function formatUserInfo(
   member: Omit<APIGuildMember, "deaf" | "mute"> | undefined,
   targetUser: APIUser | undefined,
   interaction: APIInteraction,
-  app: typeof App,
+  app: Bot,
 ) {
   const createdAt = targetUser && time(Math.floor(DiscordSnowflake.timestampFrom(targetUser.id) / 1000), "F");
   const embed = new EmbedBuilder().setDescription(

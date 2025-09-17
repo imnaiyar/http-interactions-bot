@@ -1,7 +1,10 @@
 import { HIDE_OPTIONS } from "@/constants";
 import { IntegrationType, type SlashCommand } from "@/structures";
 import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
-import puppeteer from "puppeteer";
+
+// Note: Puppeteer is not available in Cloudflare Workers
+// This command is temporarily disabled until we implement a Workers-compatible screenshot service
+
 const devicesDimensions: Record<string, { width: number; height: number; isMobile?: boolean; isLandscape?: boolean }> = {
   "iphone-14-pro-max": { width: 430, height: 932, isMobile: true },
   "s24-ultra": { width: 500, height: 915, isMobile: true },
@@ -10,7 +13,6 @@ const devicesDimensions: Record<string, { width: number; height: number; isMobil
   "desktop-xs": { width: 1440, height: 900 },
 };
 
-// TODO: Handle puppeteer errors
 export default {
   data: {
     name: "snap",
@@ -48,44 +50,10 @@ export default {
   },
   async run(app, interaction, options) {
     const hide = options.getBoolean("hide");
-    const url = options.getString("url", true);
-    const viewport = options.getString("viewport");
-    const waitFor = options.getNumber("wait-for");
-    if (!/^https?:\/\/.+/.test(url)) {
-      return void (await app.api.interactions.reply(interaction.id, interaction.token, {
-        content: "Not a valid url",
-        flags: 64, // ephemeral
-      }));
-    }
-    await app.api.interactions.defer(interaction.id, interaction.token, {
+    
+    await app.api.interactions.reply(interaction.id, interaction.token, {
+      content: "❌ Screenshot functionality is temporarily disabled in the Cloudflare Workers version. This feature requires browser automation that's not available in the Workers runtime.",
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
-    const start = performance.now();
-    const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
-    const page = await browser.newPage();
-
-    await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
-
-    // Set viewport size
-    await page.setViewport(viewport ? devicesDimensions[viewport] : { width: 1280, height: 720 });
-
-    // Navigate to the provided URL
-    await page.goto(url);
-
-    if (waitFor) await Bun.sleep(waitFor * 1000);
-
-    // Take a screenshot
-    const screenshotBuffer = await page.screenshot();
-    await browser.close();
-    const end = performance.now();
-    return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
-      content: `Took: \`${((end - start) / 1000).toFixed(2)}s\``,
-      files: [
-        {
-          name: "screenshot.png",
-          data: screenshotBuffer,
-        },
-      ],
-    }));
   },
 } satisfies SlashCommand;

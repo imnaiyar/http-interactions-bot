@@ -5,7 +5,7 @@ import {
   InteractionType,
 } from "@discordjs/core/http-only";
 import { EventEmitter } from "node:events";
-import type App from "@/app";
+import type { Bot } from "@/bot";
 
 interface CollectorOptions<T extends InteractionType.MessageComponent | InteractionType.ModalSubmit> {
   filter?: (
@@ -38,12 +38,12 @@ class Collector<
   T extends InteractionType.MessageComponent | InteractionType.ModalSubmit = InteractionType.MessageComponent,
 > extends EventEmitter {
   private collected: (APIMessageComponentInteraction | APIModalSubmitInteraction)[] = [];
-  private timer: Timer | undefined;
+  private timer: NodeJS.Timeout | undefined;
   private type: T;
   private filter: (int: APIMessageComponentInteraction | APIModalSubmitInteraction) => boolean;
 
   public constructor(
-    private app: typeof App,
+    private app: Bot,
     private options: CollectorOptions<T> = {},
   ) {
     super();

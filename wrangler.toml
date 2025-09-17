@@ -1,0 +1,22 @@
+name = "http-interactions-bot"
+main = "dist/index.js"
+compatibility_date = "2024-12-18"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "http-interactions-bot"
+
+[env.development]
+name = "http-interactions-bot-dev"
+
+# Environment variables (these will be set via wrangler secret or dashboard)
+[vars]
+# These can be set via: wrangler secret put DISCORD_TOKEN
+# PUBLIC_KEY = "your_public_key"
+# CLIENT_ID = "your_client_id"
+
+# Binding for KV storage (optional for future use)
+# [[kv_namespaces]]
+# binding = "REMINDERS"
+# id = "your_kv_namespace_id"
+# preview_id = "your_preview_kv_namespace_id"

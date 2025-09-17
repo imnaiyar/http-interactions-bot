@@ -3,7 +3,31 @@ import { codeBlock, EmbedBuilder } from "@discordjs/builders";
 import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { postToHaste } from "@/utils";
-import util from "node:util";
+
+// For Workers compatibility, use a basic inspect function instead of Node's util.inspect
+function inspect(obj: any, options: { depth?: number } = {}): string {
+  const depth = options.depth ?? 0;
+  
+  if (obj === null) return 'null';
+  if (obj === undefined) return 'undefined';
+  if (typeof obj === 'string') return `'${obj}'`;
+  if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+  if (typeof obj === 'function') return `[Function: ${obj.name || 'anonymous'}]`;
+  
+  if (Array.isArray(obj)) {
+    if (depth === 0) return '[Array]';
+    return `[${obj.map(item => inspect(item, { depth: depth - 1 })).join(', ')}]`;
+  }
+  
+  if (typeof obj === 'object') {
+    if (depth === 0) return '[Object]';
+    const keys = Object.keys(obj);
+    const props = keys.slice(0, 5).map(key => `${key}: ${inspect(obj[key], { depth: depth - 1 })}`);
+    return `{ ${props.join(', ')}${keys.length > 5 ? ', ...' : ''} }`;
+  }
+  
+  return String(obj);
+}
 export default {
   data: {
     name: "eval",
@@ -53,7 +77,7 @@ export default {
     const regex = /^\d+$|^Infinity$|^null$/;
 
     const match = dp.match(regex);
-    if (code.includes("process.env")) {
+    if (code.includes("process.env") || code.includes("TOKEN") || code.includes("DISCORD")) {
       return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
         content: "You cannot evaluate an expression that may expose secrets",
       }));
@@ -79,9 +103,10 @@ export default {
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
   // Token protection
-  output = (typeof output === "string" ? output : util.inspect(output, { depth: depth }))
-    .replaceAll(process.env.TOKEN!, "~~REDACTED~~")
-    .replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED--'");
+  output = (typeof output === "string" ? output : inspect(output, { depth: depth }))
+    .replaceAll("TOKEN", "~~REDACTED~~")
+    .replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED~~'")
+    .replaceAll(/DISCORD_TOKEN/g, "~~REDACTED~~");
   let embOutput;
 
   if (!haste && output.length <= 2048) {

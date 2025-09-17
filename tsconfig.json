@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // Enable latest features
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext", "WebWorker"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
@@ -11,6 +11,8 @@
     // Bundler mode
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     // Best practices
     "strict": true,
@@ -23,6 +25,9 @@
     "noPropertyAccessFromIndexSignature": false,
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    "types": ["@cloudflare/workers-types"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

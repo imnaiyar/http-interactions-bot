@@ -1,8 +1,9 @@
 import { MessageFlags, type APIApplicationCommandInteraction } from "@discordjs/core/http-only";
 import type { ContextMenu, SlashCommand } from "@/structures";
-import type App from "@/app";
+import type { Bot } from "@/bot";
+
 export const validate = (
-  app: typeof App,
+  app: Bot,
   interaction: APIApplicationCommandInteraction,
   command: SlashCommand | ContextMenu<"Message" | "User"> | undefined,
 ) => {

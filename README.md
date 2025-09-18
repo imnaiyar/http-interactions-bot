@@ -1,109 +1,89 @@
-# HTTP Interactions Bot - Cloudflare Workers Edition
+# Read Manga Bot
 
-A Discord bot built with TypeScript that runs on Cloudflare Workers, utilizing HTTP interactions for optimal performance and scalability.
+A Discord bot that allows users to read manga directly within Discord using interactive components and slash commands.
 
-## 🚀 Features
+## Features
 
-- **Serverless**: Runs on Cloudflare Workers for global edge deployment
-- **HTTP-only**: Uses Discord's HTTP interactions API (no gateway connection required)
-- **User Installable**: Can be installed by users in any server or DM
-- **TypeScript**: Fully typed codebase with modern TypeScript features
-- **Fast**: Lightning-fast responses with edge computing
+- **Manga Search**: Search for manga with autocomplete functionality
+- **Chapter Reading**: Read manga chapters with an interactive page viewer
+- **Cross-Platform**: Works in Discord servers, DMs, and private channels
 
-## 📋 Available Commands
+## Commands
 
-### Slash Commands
-- `/ping` - Check bot responsiveness
-- `/facts` - Get random interesting facts
-- `/userinfo` - Display user information
-- `/eval` - Execute JavaScript code (owner only)
-- `/todo` - Manage your todo list
-- `/bookmarks` - Manage bookmarks
-- `/convert` - Unit conversion utility
-- `/reminders` - Set and manage reminders
-- `/ephemeral` - Toggle ephemeral responses
-- `/snap` - Take website screenshots (temporarily disabled)
+### `/manga read`
+Read a specific manga chapter with interactive navigation.
 
-### Context Menu Commands
-- **User Commands**: Get user info, translate messages
-- **Message Commands**: Bookmark messages, prettify code, get message info
+**Parameters:**
+- `manga` - The manga to read (with autocomplete)
+- `chapter` - The chapter to read (with autocomplete)
 
-## 🛠️ Development Setup
+**Features:**
+- Interactive page viewer with media gallery
+- Previous/Next navigation buttons
+- Page selection dropdown
+- Real-time page updates
+
+### `/manga continue`
+Continue reading a manga from where you left off.
+
+**Parameters:**
+- `manga` - The manga to continue reading (with autocomplete)
+
+## Tech Stack
+
+- **Runtime**: Cloudflare Workers
+- **Language**: TypeScript
+- **Testing**: Vitest
+- **Deployment**: Wrangler
+
+
+## Environment Variables
+
+The bot requires the following environment variables:
+
+- `TOKEN` - Discord bot token
+- `APP_ID` - Discord application ID
+- `MANGA_API` - Manga API endpoint URL
+
+## Development
 
 ### Prerequisites
-- [pnpm](https://pnpm.io/) package manager
-- [Cloudflare account](https://dash.cloudflare.com/) with Workers enabled
-- Discord application with bot token
+- Node.js 18+
+- pnpm package manager
+- Cloudflare Workers account
 
-### Installation
+### Setup
 
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+3. Set up environment variables in `.env` file
+
+4. Start development server:
+   ```bash
+   pnpm dev
+   ```
+
+### Deployment
+
+Deploy to Cloudflare Workers:
 ```bash
-# Clone the repository
-git clone https://github.com/imnaiyar/http-interactions-bot.git
-cd http-interactions-bot
-
-# Install dependencies
-pnpm install
-
-# Build the project
-pnpm build
+pnpm run deploy
 ```
 
-### Environment Variables
+### Testing
 
-Set up your environment variables in Cloudflare Workers:
-
+Run tests with Vitest:
 ```bash
-# Using Wrangler CLI
-pnpm wrangler secret put DISCORD_TOKEN
-pnpm wrangler secret put DISCORD_PUBLIC_KEY
-pnpm wrangler secret put DISCORD_CLIENT_ID
+pnpm test
 ```
 
-### Local Development
+## API Integration
 
-```bash
-# Start local development server
-pnpm dev
-
-# Register Discord commands
-export DISCORD_TOKEN="your_bot_token"
-export DISCORD_CLIENT_ID="your_client_id"
-pnpm commands
-```
-
-## 🚀 Deployment
-
-```bash
-# Deploy to Cloudflare Workers
-pnpm deploy
-```
-
-Update your Discord application's webhook URL to:
-`https://your-worker.your-subdomain.workers.dev/interactions`
-
-## 📚 Architecture
-
-This bot has been converted from a traditional Node.js/Express.js application to run on Cloudflare Workers:
-
-- **Runtime**: Cloudflare Workers (V8 Isolates)
-- **HTTP Handler**: Native Workers fetch API
-- **Package Manager**: pnpm
-- **Build Tool**: TypeScript + Wrangler
-- **Deployment**: Cloudflare Workers
-
-See [WORKERS_CONVERSION.md](./WORKERS_CONVERSION.md) for detailed conversion information.
-
-## 🔗 Resources
-
-- [Discord Interactions API](https://discord.com/developers/docs/interactions/receiving-and-responding#receiving-an-interaction)
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+The bot integrates with a manga API service to:
+- Search for manga titles
+- Retrieve manga metadata
+- Fetch chapter pages and images

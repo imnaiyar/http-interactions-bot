@@ -1,29 +1,19 @@
 /**
  * Welcome to Cloudflare Workers! This is your new worker, you can deploy it to the Cloudflare Edge with Wrangler.
- * 
+ *
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { InteractionResponseType, verifyKey } from 'discord-interactions';
-import { InteractionType } from '@discordjs/core/http-only';
+import { InteractionResponseType, verifyKey } from "discord-interactions";
+import { InteractionType } from "@discordjs/core/http-only";
 import type {
   APIInteraction,
   APIApplicationCommandInteraction,
   APIApplicationCommandAutocompleteInteraction,
   APIMessageComponentInteraction,
   APIModalSubmitInteraction,
-} from '@discordjs/core/http-only';
-import { Bot } from './bot';
-
-export interface Env {
-  // Environment variables
-  DISCORD_PUBLIC_KEY: string;
-  DISCORD_TOKEN: string;
-  DISCORD_CLIENT_ID: string;
-  
-  // Optional KV namespace for reminders
-  REMINDERS?: KVNamespace;
-}
+} from "@discordjs/core/http-only";
+import { Bot } from "./bot";
 
 // Initialize bot instance
 let botInstance: Bot | null = null;
@@ -36,8 +26,8 @@ const getBotInstance = (env: Env): Bot => {
 };
 
 async function verifyDiscordRequest(request: Request, env: Env): Promise<boolean> {
-  const signature = request.headers.get('x-signature-ed25519');
-  const timestamp = request.headers.get('x-signature-timestamp');
+  const signature = request.headers.get("x-signature-ed25519");
+  const timestamp = request.headers.get("x-signature-timestamp");
   const body = await request.clone().text();
 
   if (!signature || !timestamp) {
@@ -51,7 +41,7 @@ async function handleDiscordInteraction(request: Request, env: Env): Promise<Res
   // Verify the request is from Discord
   const isValid = await verifyDiscordRequest(request, env);
   if (!isValid) {
-    return new Response('Invalid signature', { status: 401 });
+    return new Response("Invalid signature", { status: 401 });
   }
 
   const interaction: APIInteraction = await request.json();
@@ -59,11 +49,10 @@ async function handleDiscordInteraction(request: Request, env: Env): Promise<Res
 
   // Handle ping
   if (interaction.type === InteractionType.Ping) {
-    console.log('Ping received!');
-    return new Response(
-      JSON.stringify({ type: InteractionResponseType.PONG }),
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+    console.log("Ping received!");
+    return new Response(JSON.stringify({ type: InteractionResponseType.PONG }), {
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {
@@ -84,10 +73,10 @@ async function handleDiscordInteraction(request: Request, env: Env): Promise<Res
       return await bot.handleModalSubmit(interaction as APIModalSubmitInteraction);
     }
 
-    return new Response('Unknown interaction type', { status: 400 });
+    return new Response("Unknown interaction type", { status: 400 });
   } catch (error) {
-    console.error('Error handling interaction:', error);
-    return new Response('Internal server error', { status: 500 });
+    console.error("Error handling interaction:", error);
+    return new Response("Internal server error", { status: 500 });
   }
 }
 
@@ -96,17 +85,17 @@ export default {
     const url = new URL(request.url);
 
     // Handle Discord interactions
-    if (url.pathname === '/interactions' && request.method === 'POST') {
+    if (url.pathname === "/interactions" && request.method === "POST") {
       return await handleDiscordInteraction(request, env);
     }
 
     // Handle health check
-    if (url.pathname === '/health' && request.method === 'GET') {
-      return new Response('OK', { status: 200 });
+    if (url.pathname === "/health" && request.method === "GET") {
+      return new Response("OK", { status: 200 });
     }
 
     // Handle other routes
-    return new Response('Not found', { status: 404 });
+    return new Response("Not found", { status: 404 });
   },
 
   // Scheduled handler for reminders (optional)

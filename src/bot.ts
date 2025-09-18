@@ -13,31 +13,30 @@ import {
   type Snowflake,
   type APIMessageComponentInteraction,
   type APIModalSubmitInteraction,
-} from '@discordjs/core/http-only';
-import { Collection } from '@discordjs/collection';
-import { REST, type RawFile } from '@discordjs/rest';
-import { InteractionOptionResolver } from '@sapphire/discord-utilities';
-import { InteractionResponseType } from 'discord-interactions';
-import { EventEmitter } from 'node:events';
+} from "@discordjs/core/http-only";
+import { Collection } from "@discordjs/collection";
+import { REST, type RawFile } from "@discordjs/rest";
+import { InteractionOptionResolver } from "@sapphire/discord-utilities";
+import { InteractionResponseType } from "discord-interactions";
+import { EventEmitter } from "node:events";
 
-import type { ContextMenu, SlashCommand } from '@/structures';
-import { loadSlash, loadContext, validate } from '@/handlers';
-import { handleReminders } from '@/handlers';
-import { Collector } from '@/utils/index';
-import config from '@/config';
-import type { Env } from './index';
+import type { ContextMenu, SlashCommand } from "@/structures";
+import { loadSlash, loadContext, validate } from "@/handlers";
+import { handleReminders } from "@/handlers";
+import { Collector } from "@/utils/index";
+import config from "@/config";
 
 type RepliableInteractions = Exclude<APIInteraction, APIApplicationCommandAutocompleteInteraction>;
 
 export class Bot extends EventEmitter {
   public slash: Collection<string, SlashCommand> = new Collection();
-  public contexts: Collection<string, ContextMenu<'User' | 'Message'>> = new Collection();
+  public contexts: Collection<string, ContextMenu<"User" | "Message">> = new Collection();
   public collector = Collector;
   public config = config;
   public channels = new Collection<string, APIChannel | APIDMChannel>();
   public api: API;
   public ephemeral: MessageFlags | undefined = MessageFlags.Ephemeral;
-  private env: Env;
+  public env: Env;
 
   constructor(env: Env) {
     super();
@@ -49,16 +48,16 @@ export class Bot extends EventEmitter {
   private async init() {
     try {
       // Load commands - we'll need to modify this for Workers
-      const sCommands = await loadSlash('commands/slash');
-      const contexts = await loadContext('commands/contexts');
+      const sCommands = await loadSlash("commands/slash");
+      const contexts = await loadContext("commands/contexts");
       this.slash = sCommands;
       this.contexts = contexts;
 
       // Log bot user
       const user = await this.api.users.get(this.env.DISCORD_CLIENT_ID);
-      console.log('Bot initialized as:', user.username);
+      console.log("Bot initialized as:", user.username);
     } catch (error) {
-      console.error('Failed to initialize bot:', error);
+      console.error("Failed to initialize bot:", error);
     }
   }
 
@@ -70,7 +69,7 @@ export class Bot extends EventEmitter {
       const command = this.slash.get(commandName);
       const isValid = validate(this, interaction, command);
       if (!isValid) {
-        return new Response('Unauthorized', { status: 403 });
+        return new Response("Unauthorized", { status: 403 });
       }
 
       try {
@@ -78,8 +77,8 @@ export class Bot extends EventEmitter {
         // Return empty response since Discord API calls handle the response
         return new Response(null, { status: 200 });
       } catch (err) {
-        console.error('Command execution error:', err);
-        return new Response('Internal error', { status: 500 });
+        console.error("Command execution error:", err);
+        return new Response("Internal error", { status: 500 });
       }
     }
 
@@ -87,19 +86,19 @@ export class Bot extends EventEmitter {
       const command = this.contexts.get(interaction.data.name);
       const isValid = validate(this, interaction, command);
       if (!isValid) {
-        return new Response('Unauthorized', { status: 403 });
+        return new Response("Unauthorized", { status: 403 });
       }
 
       try {
         await command!.run(this, interaction as unknown as APIContextMenuInteraction, options);
         return new Response(null, { status: 200 });
       } catch (err) {
-        console.error('Context command execution error:', err);
-        return new Response('Internal error', { status: 500 });
+        console.error("Context command execution error:", err);
+        return new Response("Internal error", { status: 500 });
       }
     }
 
-    return new Response('Unknown command type', { status: 400 });
+    return new Response("Unknown command type", { status: 400 });
   }
 
   async handleAutocomplete(interaction: APIApplicationCommandAutocompleteInteraction): Promise<Response> {
@@ -108,9 +107,9 @@ export class Bot extends EventEmitter {
       return new Response(
         JSON.stringify({
           type: InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
-          data: { choices: [{ name: 'No command found! Something went wrong', value: null }] },
+          data: { choices: [{ name: "No command found! Something went wrong", value: null }] },
         }),
-        { headers: { 'Content-Type': 'application/json' } }
+        { headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -120,20 +119,20 @@ export class Bot extends EventEmitter {
       await run(this, interaction, options);
       return new Response(null, { status: 200 });
     } catch (err) {
-      console.error('Autocomplete error:', err);
-      return new Response('Internal error', { status: 500 });
+      console.error("Autocomplete error:", err);
+      return new Response("Internal error", { status: 500 });
     }
   }
 
   async handleMessageComponent(interaction: APIMessageComponentInteraction): Promise<Response> {
-    const userId = interaction.data.custom_id.split(';')[1];
+    const userId = interaction.data.custom_id.split(";")[1];
     if (!userId) {
-      return new Response('Invalid component', { status: 400 });
+      return new Response("Invalid component", { status: 400 });
     }
 
     if (userId !== (interaction.member?.user || interaction.user!).id) {
       await this.reply(interaction, {
-        content: 'This is not your interaction. Nice try tho Haha!!',
+        content: "This is not your interaction. Nice try tho Haha!!",
         flags: 64,
       });
     }
@@ -143,7 +142,7 @@ export class Bot extends EventEmitter {
 
   async handleModalSubmit(interaction: APIModalSubmitInteraction): Promise<Response> {
     // Handle modal submissions here
-    console.log('Modal submit received:', interaction.data.custom_id);
+    console.log("Modal submit received:", interaction.data.custom_id);
     return new Response(null, { status: 200 });
   }
 
@@ -151,7 +150,7 @@ export class Bot extends EventEmitter {
     try {
       await handleReminders(this);
     } catch (error) {
-      console.error('Error handling scheduled reminders:', error);
+      console.error("Error handling scheduled reminders:", error);
     }
   }
 
@@ -164,7 +163,7 @@ export class Bot extends EventEmitter {
   public editReply(
     interaction: RepliableInteractions,
     data: APIInteractionResponseCallbackData & { files?: RawFile[] },
-    messageId: Snowflake = '@original'
+    messageId: Snowflake = "@original",
   ) {
     return this.api.interactions.editReply(interaction.application_id, interaction.token, data, messageId);
   }
@@ -172,13 +171,13 @@ export class Bot extends EventEmitter {
   /** Update this interactions Message */
   public update(
     interaction: APIMessageComponentInteraction | APIModalSubmitInteraction,
-    data: APIInteractionResponseCallbackData & { files?: RawFile[] }
+    data: APIInteractionResponseCallbackData & { files?: RawFile[] },
   ) {
     return this.api.interactions.updateMessage(interaction.id, interaction.token, data);
   }
 
   /** Delete the reply to this interaction */
-  public deleteReply(interaction: RepliableInteractions, messageId: Snowflake = '@original') {
+  public deleteReply(interaction: RepliableInteractions, messageId: Snowflake = "@original") {
     return this.api.interactions.deleteReply(interaction.application_id, interaction.token, messageId);
   }
 

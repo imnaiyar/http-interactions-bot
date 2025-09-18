@@ -1,5 +1,5 @@
 /* import { ContextType, IntegrationType, type SlashCommand } from "@/structures";
-import { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core/http-only";
+import { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageFlags } from "discord-api-types/v10";
 import fs from "node:fs";
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, StringSelectMenuBuilder, time } from "@discordjs/builders";
 export default {
@@ -66,16 +66,16 @@ export default {
     const hide = options.getBoolean("hide");
 
     const userId = interaction.user?.id ?? interaction.member!.user.id;
-    if (!fs.existsSync("todos.toml")) fs.writeFileSync("todos.toml", tomlify({}, { delims: false }));
+    if (!fs.existsSync("todos.toml")) fs.writeFileSync("todos.toml", tomlify({}, { delims: false });
     const parsed: TODOs = toml.parse(fs.readFileSync("todos.toml", "utf8"));
     const data = parsed[userId];
     switch (sub) {
       case "get": {
         if (!data) {
-          return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+          await app.api.replyToInteraction(interaction.id, interaction.token, {
             content: "Invalid: No TODOs found",
             flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-          }));
+          });
         }
 
         let index = 0;
@@ -95,7 +95,7 @@ export default {
               todo.completedAt ? `\n-# Completed At: ${time(new Date(todo.completedAt), "d")}` : ""
             }`,
             inline: true,
-          }));
+          });
           const embed = new EmbedBuilder()
             .setTitle(`Your TODOs`)
             .setAuthor({ name: `${interaction.user?.username ?? interaction.member?.user.username} TODOs` })
@@ -165,7 +165,7 @@ export default {
                 delete parsed[userId][k].completedAt;
               }
             }
-            fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false }));
+            fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false });
           }
           await app.update(int, {
             ...getList(),
@@ -176,17 +176,17 @@ export default {
       case "delete": {
         const keyword = options.getString("keyword", true);
         if (!data?.[keyword]) {
-          return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+          await app.api.replyToInteraction(interaction.id, interaction.token, {
             content: "Invalid: No TODOs found",
             flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-          }));
+          });
         }
         delete parsed[userId][keyword];
-        fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false }));
-        return void (await app.reply(interaction, {
+        fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false });
+        await app.reply(interaction, {
           content: "Deleted TODO",
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-        }));
+        });
       }
       case "create": {
         const description = options.getString("description", true);
@@ -197,8 +197,8 @@ export default {
           status: "Pending" as const,
         };
         parsed[userId] = { ...parsed[userId], [Math.random().toString(36).slice(2)]: todo };
-        fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false }));
-        return void (await app.reply(interaction, {
+        fs.writeFileSync("todos.toml", tomlify(parsed, { delims: false });
+        await app.reply(interaction, {
           embeds: [
             {
               author: { name: "Created TODO!" },
@@ -206,7 +206,7 @@ export default {
             },
           ],
           flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-        }));
+        });
       }
     }
   },
@@ -214,16 +214,16 @@ export default {
     const sub = opt.getSubcommand();
     if (sub !== "delete") return;
     const userId = int.user?.id ?? int.member!.user.id;
-    if (!fs.existsSync("todos.toml")) fs.writeFileSync("todos.toml", tomlify({}, { delims: false }));
+    if (!fs.existsSync("todos.toml")) fs.writeFileSync("todos.toml", tomlify({}, { delims: false });
     const parsed: TODOs = toml.parse(fs.readFileSync("todos.toml", "utf8"));
     const data = parsed[userId];
     let choices = data
       ? Object.entries(data).map(([k, v]) => ({ name: v.description.slice(0, 50), value: k }))
       : [{ name: "No TODOs found", value: "none" }];
     if (!choices.length) choices = [{ name: "No TODOs found", value: "none" }];
-    return void (await app.api.interactions.createAutocompleteResponse(int.id, int.token, {
+    await app.api.createAutocompleteResponse(int.id, int.token, {
       choices,
-    }));
+    });
   },
 } satisfies SlashCommand<true>;
 interface TODOs {

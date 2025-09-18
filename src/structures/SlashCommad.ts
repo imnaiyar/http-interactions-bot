@@ -2,7 +2,7 @@ import type {
   APIApplicationCommandOption,
   APIChatInputApplicationCommandInteraction,
   APIApplicationCommandAutocompleteInteraction,
-} from "@discordjs/core/http-only";
+} from "discord-api-types/v10";
 import type { ContextType, IntegrationType } from "./index";
 import type { Bot } from "@/bot";
 import type { InteractionOptionResolver } from "@sapphire/discord-utilities";

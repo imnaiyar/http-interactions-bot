@@ -3,7 +3,7 @@ import {
   type APIMessageComponentInteraction,
   type APIModalSubmitInteraction,
   InteractionType,
-} from "@discordjs/core/http-only";
+} from "discord-api-types/v10";
 import { EventEmitter } from "node:events";
 import type { Bot } from "@/bot";
 

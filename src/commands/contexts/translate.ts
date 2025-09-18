@@ -1,5 +1,5 @@
 import { IntegrationType, type ContextMenu } from '@/structures';
-import { ApplicationCommandType, type APIEmbed } from '@discordjs/core';
+import { ApplicationCommandType, type APIEmbed } from 'discord-api-types/v10';
 import { translate } from '@vitalets/google-translate-api';
 import ISO6391 from 'iso-639-1';
 export default {
@@ -11,15 +11,15 @@ export default {
 	},
 	async run(app, interaction, options) {
 		const message = options.getTargetMessage();
-		await app.api.interactions.defer(interaction.id, interaction.token, {
+		await app.api.deferInteraction(interaction.id, interaction.token, {
 			flags: app.ephemeral,
 		});
 		const output = await translate(message.content, { to: 'en' });
 		const inputLang = ISO6391.getName(output.raw.src);
 		if (inputLang === ISO6391.getName('en')) {
-			return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: `The message is already in English.`,
-			}));
+			});
 		}
 		const embed: APIEmbed = {
 			title: `Translation from ${inputLang} to English`,
@@ -31,7 +31,7 @@ export default {
 				},
 			],
 		};
-		await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+		await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 			embeds: [embed],
 		});
 	},

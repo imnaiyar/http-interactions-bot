@@ -1,5 +1,5 @@
 import { ContextType, IntegrationType, type SlashCommand } from '@/structures';
-import { ApplicationCommandOptionType, ButtonStyle, MessageFlags } from '@discordjs/core/http-only';
+import { ApplicationCommandOptionType, ButtonStyle, MessageFlags } from 'discord-api-types/v10';
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from '@discordjs/builders';
 export default {
 	data: {
@@ -54,10 +54,10 @@ export default {
 		const sub = options.getSubcommand();
 		const hide = options.getBoolean('hide');
 		if (!value || value === 'null') {
-			return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+			await app.api.replyToInteraction(interaction.id, interaction.token, {
 				content: 'Invalid Keyword: No bookmarks found with that keyword',
 				flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-			}));
+			});
 		}
 
 		const userId = interaction.user?.id ?? interaction.member!.user.id;
@@ -65,10 +65,10 @@ export default {
 		switch (sub) {
 			case 'get': {
 				if (!bookmark) {
-					return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+					await app.api.replyToInteraction(interaction.id, interaction.token, {
 						content: 'Invalid Keyword: No bookmarks found with that keyword',
 						flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-					}));
+					});
 				}
 				const embed = new EmbedBuilder()
 					.setTitle(`${bookmark.username} Message`)
@@ -77,7 +77,7 @@ export default {
 				const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Link').setURL(bookmark.url),
 				);
-				await app.api.interactions.reply(interaction.id, interaction.token, {
+				await app.api.replyToInteraction(interaction.id, interaction.token, {
 					embeds: [embed.toJSON() as any],
 					components: [buttons.toJSON() as any],
 					flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
@@ -86,10 +86,10 @@ export default {
 			}
 			case 'delete': {
 				if (!bookmark) {
-					return void (await app.api.interactions.reply(interaction.id, interaction.token, {
+					await app.api.replyToInteraction(interaction.id, interaction.token, {
 						content: 'Invalid Keyword: No bookmark found with that keyword',
 						flags: MessageFlags.Ephemeral,
-					}));
+					});
 				}
 				const embed = new EmbedBuilder()
 					.setTitle(`Are you sure you want to delete this?`)
@@ -109,7 +109,7 @@ export default {
 						new ButtonBuilder().setLabel('Message Link').setStyle(ButtonStyle.Link).setURL(bookmark.url),
 					)
 					.toJSON();
-				app.api.interactions.reply(interaction.id, interaction.token, {
+				app.api.replyToInteraction(interaction.id, interaction.token, {
 					embeds: [embed as any],
 					components: [buttons as any],
 					flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
@@ -143,7 +143,7 @@ export default {
 				});
 				collector.on('end', async (_collected, reason) => {
 					if (reason === 'timeout') {
-						app.api.interactions.editReply(interaction.application_id, interaction.token, {
+						app.api.editInteractionReply(interaction.application_id, interaction.token, {
 							content: 'Canceled! Timed Out.',
 							embeds: [],
 							components: [],
@@ -161,7 +161,7 @@ export default {
 			const parsed = bookmarks.filter((v) => v.authorId === (interaction.member?.user.id ?? interaction.user!.id));
 
 			if (!parsed) {
-				await app.api.interactions.createAutocompleteResponse(interaction.id, interaction.token, {
+				await app.api.createAutocompleteResponse(interaction.id, interaction.token, {
 					choices: [
 						{
 							name: 'No saved bookmarks',
@@ -184,11 +184,11 @@ export default {
 					name: `${v.username}: ${v.content.substring(0, 40)}...`,
 					value: v.messageId.toString(),
 				}));
-			app.api.interactions.createAutocompleteResponse(interaction.id, interaction.token, {
+			app.api.createAutocompleteResponse(interaction.id, interaction.token, {
 				choices: data,
 			});
 		} catch (err) {
-			app.api.interactions.createAutocompleteResponse(interaction.id, interaction.token, {
+			app.api.createAutocompleteResponse(interaction.id, interaction.token, {
 				choices: [{ name: 'Something went wrong', value: 'wrong' }],
 			});
 			console.error(err);

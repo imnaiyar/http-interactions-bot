@@ -5,14 +5,14 @@
  */
 
 import { InteractionResponseType, verifyKey } from "discord-interactions";
-import { InteractionType } from "@discordjs/core/http-only";
+import { InteractionType } from "discord-api-types/v10";
 import type {
   APIInteraction,
   APIApplicationCommandInteraction,
   APIApplicationCommandAutocompleteInteraction,
   APIMessageComponentInteraction,
   APIModalSubmitInteraction,
-} from "@discordjs/core/http-only";
+} from "discord-api-types/v10";
 import { Bot } from "./bot";
 
 // Initialize bot instance

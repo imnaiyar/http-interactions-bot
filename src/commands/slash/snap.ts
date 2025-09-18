@@ -1,6 +1,6 @@
 import { HIDE_OPTIONS } from "@/constants";
 import { IntegrationType, type SlashCommand } from "@/structures";
-import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
+import { ApplicationCommandOptionType, MessageFlags } from "discord-api-types/v10";
 
 // Note: Puppeteer is not available in Cloudflare Workers
 // This command is temporarily disabled until we implement a Workers-compatible screenshot service
@@ -51,7 +51,7 @@ export default {
   async run(app, interaction, options) {
     const hide = options.getBoolean("hide");
     
-    await app.api.interactions.reply(interaction.id, interaction.token, {
+    await app.api.replyToInteraction(interaction.id, interaction.token, {
       content: "❌ Screenshot functionality is temporarily disabled in the Cloudflare Workers version. This feature requires browser automation that's not available in the Workers runtime.",
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });

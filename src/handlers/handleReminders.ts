@@ -32,11 +32,10 @@ export default async (_app: Bot) => {
 					value: '<t:' + Math.trunc(Number(setAt) / 1000) + ':F> (<t:' + Math.trunc(Number(setAt) / 1000) + ':R>)',
 				});
 
-			await _app.api.channels
-				.createMessage(dmId, {
-					embeds: [embed.toJSON() as any],
-				})
-				.catch(console.error);
+			await _app.api.createMessage(dmId, {
+				embeds: [embed.toJSON() as any],
+			})
+			.catch(console.error);
 		}
 	} catch (error) {
 		console.error('Error handling reminders:', error);

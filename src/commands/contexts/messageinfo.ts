@@ -1,6 +1,6 @@
 import { postToHaste } from "@/utils";
 import type { ContextMenu } from "@/structures";
-import { ApplicationCommandType } from "@discordjs/core/http-only";
+import { ApplicationCommandType } from "discord-api-types/v10";
 import { formatWithOptions } from "node:util";
 export default {
   data: {
@@ -11,7 +11,7 @@ export default {
   },
   async run(app, interaction, options) {
     const target = options.getTargetMessage();
-    await app.api.interactions.defer(interaction.id, interaction.token, {
+    await app.api.deferInteraction(interaction.id, interaction.token, {
       flags: app.ephemeral,
     });
     const formatted = formatWithOptions({ depth: 5 }, "%O", target);
@@ -19,7 +19,7 @@ export default {
     if (formatted.length >= 2000) {
       toRespond = await postToHaste(formatted);
     }
-    await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+    await app.api.editInteractionReply(interaction.application_id, interaction.token, {
       content: toRespond,
     });
   },

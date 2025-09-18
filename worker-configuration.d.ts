@@ -9,6 +9,7 @@ declare namespace Cloudflare {
 		DISCORD_PUBLIC_KEY: string;
 		DISCORD_CLIENT_ID: string;
 		DISCORD_TOKEN: string;
+		MANGA_API: string;
 	}
 }
 interface Env extends Cloudflare.Env {}

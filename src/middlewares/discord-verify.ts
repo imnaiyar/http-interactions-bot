@@ -21,7 +21,7 @@ export async function verify(req: Request, env: Env): Promise<Response | undefin
 
 	const pubKey = await crypto.subtle.importKey(
 		'raw',
-		hextToUint8(env.PUBLIC_KEY!),
+		hextToUint8(env.DISCORD_PUBLIC_KEY!),
 		{ name: 'NODE-ED25519', namedCurve: 'NODE-ED25519' },
 		false,
 		['verify']

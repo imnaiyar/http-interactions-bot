@@ -1,5 +1,5 @@
 import type { ContextMenu } from '@/structures';
-import { ApplicationCommandType } from '@discordjs/core/http-only';
+import { ApplicationCommandType } from 'discord-api-types/v10';
 import { format } from 'prettier';
 import { truncate } from '@/utils';
 import { codeBlock } from '@discordjs/formatters';
@@ -19,10 +19,10 @@ export default {
 	},
 	async run(app, interaction, options) {
 		const message = options.getTargetMessage();
-		await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
+		await app.api.deferInteraction(interaction.id, interaction.token, { flags: app.ephemeral });
 		const content = message.content;
 		if (!content) {
-			await app.api.interactions.editReply(interaction.application_id, interaction.token, NO_CODE_RESPONSE);
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, NO_CODE_RESPONSE);
 			return;
 		}
 
@@ -55,7 +55,7 @@ export default {
 		}
 
 		if (!results.length) {
-			await app.api.interactions.editReply(interaction.application_id, interaction.token, NO_CODE_RESPONSE);
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, NO_CODE_RESPONSE);
 			return;
 		}
 
@@ -65,7 +65,7 @@ export default {
 			.split('')
 			.filter((char) => char === '`').length;
 
-		await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+		await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 			content: `${shortened}${'`'.repeat(3 - suffixCodeBlockLength)}`,
 		});
 	},

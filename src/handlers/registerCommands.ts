@@ -1,7 +1,6 @@
 import { loadContext, loadSlash } from "@/handlers";
 import { REST } from "@discordjs/rest";
 import type { ContextMenu, SlashCommand } from "@/structures";
-import { Routes } from "@discordjs/core/http-only";
 
 // Environment variables for Cloudflare Workers deployment
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || process.env.TOKEN || '';
@@ -43,7 +42,7 @@ const rest = new REST().setToken(DISCORD_TOKEN);
   try {
     console.log(`Started refreshing ${toRegister.length} application (/) commands.`);
 
-    const data: any = await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: toRegister });
+    const data: any = await rest.put(`/applications/${DISCORD_CLIENT_ID}/commands`, { body: toRegister });
 
     console.log(`Successfully reloaded ${data.length} application (/) commands.`);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { ContextType, IntegrationType, type ContextMenu } from '@/structures';
-import { ApplicationCommandType } from '@discordjs/core/http-only';
+import { ApplicationCommandType } from 'discord-api-types/v10';
 import fs from 'node:fs';
 import { messageLink } from '@discordjs/formatters';
 import { Bookmark } from '../slash/bookmarks';
@@ -19,7 +19,7 @@ export default {
 		const url = messageLink(message.channel_id, message.id, interaction.guild_id ?? '@me');
 		const bookmarked = (await app.env.bookmarks.getWithMetadata<'', Bookmark>(message.id, 'json')).metadata;
 		if (bookmarked) {
-			await app.api.interactions.reply(interaction.id, interaction.token, {
+			await app.api.replyToInteraction(interaction.id, interaction.token, {
 				content: 'This message is already bookmarked',
 				flags: app.ephemeral,
 			});
@@ -37,7 +37,7 @@ export default {
 			},
 		});
 
-		await app.api.interactions.reply(interaction.id, interaction.token, {
+		await app.api.replyToInteraction(interaction.id, interaction.token, {
 			content: 'Bookmark saved!',
 			flags: app.ephemeral,
 		});

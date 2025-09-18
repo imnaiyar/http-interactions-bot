@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "@discordjs/builders";
 import { type SlashCommand } from "@/structures";
 import { formatString } from "@/utils";
-import { ApplicationCommandOptionType } from "@discordjs/core";
+import { ApplicationCommandOptionType } from "discord-api-types/v10";
 
 interface Quantity {
   readonly name: string;
@@ -196,7 +196,7 @@ export default {
       if (chosenQuantity) {
         const units = quantities[chosenQuantity];
 
-        return await app.api.interactions.reply(interaction.id, interaction.token, {
+        await app.api.replyToInteraction(interaction.id, interaction.token, {
           embeds: [
             new EmbedBuilder()
               .setTitle(`Convert help: ${chosenQuantity}`)
@@ -213,7 +213,7 @@ export default {
         });
       }
 
-      return await app.api.interactions.reply(interaction.id, interaction.token, {
+      await app.api.replyToInteraction(interaction.id, interaction.token, {
         embeds: [
           new EmbedBuilder()
             .setTitle("Convert help")
@@ -265,7 +265,7 @@ export default {
       });
 
     if (!areValidStarters(starters))
-      return await app.api.interactions.reply(interaction.id, interaction.token, {
+      await app.api.replyToInteraction(interaction.id, interaction.token, {
         content: "You must convert *something;* Your message has 0 starters.",
         flags: app.ephemeral,
       });
@@ -277,7 +277,7 @@ export default {
     );
 
     if (!target)
-      return await app.api.interactions.reply(interaction.id, interaction.token, {
+      await app.api.replyToInteraction(interaction.id, interaction.token, {
         content: "You must convert *to* something; Your message doesn't have a (valid) target unit.",
         flags: app.ephemeral,
       });
@@ -288,7 +288,7 @@ export default {
     const denominatorQuantities = new Set([target.unit.denominatorQuantity, ...starters.map((x) => x.unit.denominatorQuantity)]);
 
     if (usedQuantities.size > 1 || numeratorQuantities.size > 1 || denominatorQuantities.size > 1)
-      return await app.api.interactions.reply(interaction.id, interaction.token, {
+      await app.api.replyToInteraction(interaction.id, interaction.token, {
         content: `All starting units and the target unit must be of the same quantity; The quantities you used were \`${[...usedQuantities, ...numeratorQuantities, ...denominatorQuantities].filter((x) => x)}\``,
         flags: app.ephemeral,
       });
@@ -304,7 +304,7 @@ export default {
     const amountInTarget = target.unit.tempMath ? target.unit.tempMath.toSelf(absolute) : absolute / target.unit.value;
 
     // Display amount and target unit symbol
-    return await app.api.interactions.reply(interaction.id, interaction.token, {
+    await app.api.replyToInteraction(interaction.id, interaction.token, {
       embeds: [
         new EmbedBuilder()
           .setTitle(`${formatString(quantity)} conversion`)

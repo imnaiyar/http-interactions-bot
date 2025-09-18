@@ -1,4 +1,4 @@
-import { type APIGuildMember, type APIUser, type UserAvatarFormat, type UserBannerFormat } from "@discordjs/core/http-only";
+import { type APIGuildMember, type APIUser, type UserAvatarFormat, type UserBannerFormat } from "discord-api-types/v10";
 import { type Bot } from "@/bot";
 import { calculateUserDefaultAvatarIndex } from "@discordjs/rest";
 
@@ -10,7 +10,7 @@ export class UserUtil {
    */
   public static userAvatarURL(app: Bot, user: APIUser, format?: UserAvatarFormat) {
     return (
-      (user.avatar && app.api.rest.cdn.avatar(user.id, user.avatar, format && { extension: format })) ||
+      (user.avatar && `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format || 'png'}`) ||
       UserUtil.defaultAvatarURL(app, user)
     );
   }
@@ -21,7 +21,7 @@ export class UserUtil {
    */
   public static defaultAvatarURL(app: Bot, user: APIUser) {
     const index = user.discriminator === "0" ? calculateUserDefaultAvatarIndex(user.id) : parseInt(user.discriminator) % 5;
-    return app.api.rest.cdn.defaultAvatar(index);
+    return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
   }
 
   /**
@@ -38,13 +38,13 @@ export class UserUtil {
     format?: UserAvatarFormat,
   ) {
     if (!member.avatar) return UserUtil.userAvatarURL(app, member.user!, format);
-    return app.api.rest.cdn.guildMemberAvatar(guildId, userId, member.avatar, format && { extension: format });
+    return `https://cdn.discordapp.com/guilds/${guildId}/users/${userId}/avatars/${member.avatar}.${format || 'png'}`;
   }
 
   /**
    * Return GuildMember Banner
    */
   public static bannerURL(app: Bot, user: APIUser, format?: UserBannerFormat) {
-    return user.banner && app.api.rest.cdn.banner(user.id, user.banner, format && { extension: format });
+    return user.banner && `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${format || 'png'}`;
   }
 }

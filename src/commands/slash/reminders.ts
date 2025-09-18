@@ -1,5 +1,5 @@
 import { ContextType, IntegrationType, type SlashCommand } from '@/structures';
-import { ApplicationCommandOptionType, ChannelType } from '@discordjs/core/http-only';
+import { ApplicationCommandOptionType, ChannelType } from 'discord-api-types/v10';
 import { EmbedBuilder, time } from '@discordjs/builders';
 export default {
 	data: {
@@ -49,7 +49,7 @@ export default {
 		contexts: [ContextType.BotDM, ContextType.Guild, ContextType.PrivateChannels],
 	},
 	async run(app, interaction, options) {
-		await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
+		await app.api.deferInteraction(interaction.id, interaction.token, { flags: app.ephemeral });
 		const user = interaction.user || interaction.member?.user;
 		const text = options.getString('text', true);
 		const months = options.getInteger('months', false);
@@ -58,14 +58,14 @@ export default {
 		const minutes = options.getInteger('minutes', false);
 		const seconds = options.getInteger('seconds', false);
 		if (!months && !days && !hours && !minutes && !seconds) {
-			return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'You must provide at least one time options.',
-			}));
+			});
 		}
 		if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => v.id === user!.id)) {
-			return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'You can only use this command in my DMs',
-			}));
+			});
 		}
 		const dur =
 			Date.now() +
@@ -93,7 +93,7 @@ export default {
 			},
 			expiration: Math.trunc(dur / 1000) + 3600, // 1 hour after the reminder
 		});
-		await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+		await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 			embeds: [embed.toJSON() as any],
 			flags: app.ephemeral,
 		});

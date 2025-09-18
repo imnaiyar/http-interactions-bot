@@ -1,5 +1,4 @@
 import {
-  API,
   type APIInteraction,
   type APIApplicationCommandAutocompleteInteraction,
   type APIApplicationCommandInteraction,
@@ -13,9 +12,8 @@ import {
   type Snowflake,
   type APIMessageComponentInteraction,
   type APIModalSubmitInteraction,
-} from "@discordjs/core/http-only";
+} from "discord-api-types/v10";
 import { Collection } from "@discordjs/collection";
-import { REST, type RawFile } from "@discordjs/rest";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 import { InteractionResponseType } from "discord-interactions";
 import { EventEmitter } from "node:events";
@@ -25,6 +23,7 @@ import { loadSlash, loadContext, validate } from "@/handlers";
 import { handleReminders } from "@/handlers";
 import { Collector } from "@/utils/index";
 import config from "@/config";
+import { DiscordAPI, type RawFile } from "@/services/discord";
 
 type RepliableInteractions = Exclude<APIInteraction, APIApplicationCommandAutocompleteInteraction>;
 
@@ -34,14 +33,14 @@ export class Bot extends EventEmitter {
   public collector = Collector;
   public config = config;
   public channels = new Collection<string, APIChannel | APIDMChannel>();
-  public api: API;
+  public api: DiscordAPI;
   public ephemeral: MessageFlags | undefined = MessageFlags.Ephemeral;
   public env: Env;
 
   constructor(env: Env) {
     super();
     this.env = env;
-    this.api = new API(new REST().setToken(env.DISCORD_TOKEN));
+    this.api = new DiscordAPI(env);
     this.init();
   }
 
@@ -54,7 +53,7 @@ export class Bot extends EventEmitter {
       this.contexts = contexts;
 
       // Log bot user
-      const user = await this.api.users.get(this.env.DISCORD_CLIENT_ID);
+      const user = await this.api.getUser(this.env.DISCORD_CLIENT_ID);
       console.log("Bot initialized as:", user.username);
     } catch (error) {
       console.error("Failed to initialize bot:", error);
@@ -156,7 +155,7 @@ export class Bot extends EventEmitter {
 
   /** Reply to the given interaction */
   public reply(interaction: RepliableInteractions, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
-    return this.api.interactions.reply(interaction.id, interaction.token, data);
+    return this.api.replyToInteraction(interaction.id, interaction.token, data);
   }
 
   /** Edit the reply to the given interaction */
@@ -165,7 +164,7 @@ export class Bot extends EventEmitter {
     data: APIInteractionResponseCallbackData & { files?: RawFile[] },
     messageId: Snowflake = "@original",
   ) {
-    return this.api.interactions.editReply(interaction.application_id, interaction.token, data, messageId);
+    return this.api.editInteractionReply(interaction.application_id, interaction.token, data, messageId);
   }
 
   /** Update this interactions Message */
@@ -173,16 +172,16 @@ export class Bot extends EventEmitter {
     interaction: APIMessageComponentInteraction | APIModalSubmitInteraction,
     data: APIInteractionResponseCallbackData & { files?: RawFile[] },
   ) {
-    return this.api.interactions.updateMessage(interaction.id, interaction.token, data);
+    return this.api.updateInteractionMessage(interaction.id, interaction.token, data);
   }
 
   /** Delete the reply to this interaction */
   public deleteReply(interaction: RepliableInteractions, messageId: Snowflake = "@original") {
-    return this.api.interactions.deleteReply(interaction.application_id, interaction.token, messageId);
+    return this.api.deleteInteractionReply(interaction.application_id, interaction.token, messageId);
   }
 
   /** Create a follow up response to this interaction */
   public followUp(interaction: RepliableInteractions, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
-    return this.api.interactions.followUp(interaction.application_id, interaction.token, data);
+    return this.api.followUpInteraction(interaction.application_id, interaction.token, data);
   }
 }

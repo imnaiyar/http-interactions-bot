@@ -1,6 +1,6 @@
 import { IntegrationType, type SlashCommand } from "@/structures";
 import { codeBlock, EmbedBuilder } from "@discordjs/builders";
-import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
+import { ApplicationCommandOptionType, MessageFlags } from "discord-api-types/v10";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { postToHaste } from "@/utils";
 
@@ -69,7 +69,7 @@ export default {
     const async = options.getBoolean("async");
     const haste = options.getBoolean("haste") || false;
     const hide = options.getBoolean("hide");
-    await app.api.interactions.defer(interaction.id, interaction.token, {
+    await app.api.deferInteraction(interaction.id, interaction.token, {
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
     if (async) code = `(async () => { ${code} })()`;
@@ -78,14 +78,14 @@ export default {
 
     const match = dp.match(regex);
     if (code.includes("process.env") || code.includes("TOKEN") || code.includes("DISCORD")) {
-      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+      await app.api.editInteractionReply(interaction.application_id, interaction.token, {
         content: "You cannot evaluate an expression that may expose secrets",
-      }));
+      });
     }
     if (!match) {
-      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+      await app.api.editInteractionReply(interaction.application_id, interaction.token, {
         content: `${dp} is not a valid depth`,
-      }));
+      });
     }
     let result;
     try {
@@ -97,7 +97,7 @@ export default {
       console.error(err);
       result = buildErrorResponse(err);
     }
-    await app.api.interactions.editReply(interaction.application_id, interaction.token, result);
+    await app.api.editInteractionReply(interaction.application_id, interaction.token, result);
   },
 } satisfies SlashCommand;
 

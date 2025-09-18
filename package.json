@@ -22,7 +22,6 @@
 	"dependencies": {
 		"@discordjs/builders": "^1.11.3",
 		"@discordjs/collection": "^2.1.1",
-		"@discordjs/core": "^3.0.0-dev.1757851336-b66f52f9a",
 		"@discordjs/formatters": "^0.6.1",
 		"@discordjs/rest": "^3.0.0-dev.1757851336-b66f52f9a",
 		"@discordjs/util": "^1.1.1",

@@ -1,6 +1,6 @@
 import { ContextType, IntegrationType, type SlashCommand } from "@/structures";
-import { MessageFlags } from "@discordjs/core";
-import { ApplicationCommandOptionType } from "@discordjs/core/http-only";
+import { MessageFlags } from "discord-api-types/v10";
+import { ApplicationCommandOptionType } from "discord-api-types/v10";
 
 export default {
   data: {
@@ -19,12 +19,12 @@ export default {
   },
   async run(app, interaction, options) {
     const hide = options.getBoolean("hide");
-    await app.api.interactions.defer(interaction.id, interaction.token, {
+    await app.api.deferInteraction(interaction.id, interaction.token, {
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
     const response = await fetch("https://thefact.space/random");
     const { text, source } = await response.json() as { text: string; source: string };
-    await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+    await app.api.editInteractionReply(interaction.application_id, interaction.token, {
       content: `**Random Fact**\n> ${text}\n-# [Source](<${source}>)`,
     });
   },

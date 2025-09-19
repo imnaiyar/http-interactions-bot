@@ -26,7 +26,7 @@ export function loadSlash(_dirs: string) {
 	const commands = new Collection<string, SlashCommand>();
 
 	// Add slash commands without autocomplete
-	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert];
+	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert] as SlashCommand[];
 
 	for (const command of simpleCommands) {
 		try {

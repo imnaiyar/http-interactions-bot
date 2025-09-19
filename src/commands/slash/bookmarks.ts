@@ -58,10 +58,11 @@ export default {
 				content: 'Invalid Keyword: No bookmarks found with that keyword',
 				flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
 			});
+			return;
 		}
 
 		const userId = interaction.user?.id ?? interaction.member!.user.id;
-		const bookmark = await app.env.bookmarks.get<Bookmark>(value, 'json');
+		const bookmark = (await app.env.bookmarks.getWithMetadata<Bookmark>(value)).metadata;
 		switch (sub) {
 			case 'get': {
 				if (!bookmark) {
@@ -69,6 +70,7 @@ export default {
 						content: 'Invalid Keyword: No bookmarks found with that keyword',
 						flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
 					});
+					return;
 				}
 				const embed = new EmbedBuilder()
 					.setTitle(`${bookmark.username} Message`)
@@ -90,6 +92,7 @@ export default {
 						content: 'Invalid Keyword: No bookmark found with that keyword',
 						flags: MessageFlags.Ephemeral,
 					});
+					return;
 				}
 				const embed = new EmbedBuilder()
 					.setTitle(`Are you sure you want to delete this?`)
@@ -109,7 +112,7 @@ export default {
 						new ButtonBuilder().setLabel('Message Link').setStyle(ButtonStyle.Link).setURL(bookmark.url),
 					)
 					.toJSON();
-				app.api.replyToInteraction(interaction.id, interaction.token, {
+				await app.api.replyToInteraction(interaction.id, interaction.token, {
 					embeds: [embed as any],
 					components: [buttons as any],
 					flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
@@ -156,6 +159,7 @@ export default {
 	async autocomplete(app, interaction, options) {
 		try {
 			const op = options.getFocusedOption();
+			console.log('Hello: autocomplete');
 			const value = op.value as string;
 			const bookmarks = (await app.env.bookmarks.list<Bookmark>({ prefix: '' })).keys.map((v) => v.metadata).filter(Boolean) as Bookmark[];
 			const parsed = bookmarks.filter((v) => v.authorId === (interaction.member?.user.id ?? interaction.user!.id));

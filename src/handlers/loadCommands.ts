@@ -9,6 +9,7 @@ import snap from '@/commands/slash/snap';
 import ephemeral from '@/commands/slash/ephemeral';
 import userinfo from '@/commands/slash/userinfo';
 import reminders from '@/commands/slash/reminders';
+import github from '@/commands/slash/github';
 // Commands with autocomplete need special handling
 /* import todo from "@/commands/slash/todo"; */
 import bookmarks from '@/commands/slash/bookmarks';
@@ -26,7 +27,7 @@ export function loadSlash(_dirs: string) {
 	const commands = new Collection<string, SlashCommand>();
 
 	// Add slash commands without autocomplete
-	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert] as SlashCommand[];
+	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert, github] as SlashCommand[];
 
 	for (const command of simpleCommands) {
 		try {

@@ -11,6 +11,9 @@ declare namespace Cloudflare {
 		DISCORD_PUBLIC_KEY: string;
 		DISCORD_CLIENT_ID: string;
 		DISCORD_TOKEN: string;
+		GITHUB_TOKEN?: string;
+		GITHUB_DEFAULT_OWNER?: string;
+		GITHUB_DEFAULT_REPO?: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
@@ -18,7 +21,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "DISCORD_PUBLIC_KEY" | "DISCORD_CLIENT_ID" | "DISCORD_TOKEN">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "DISCORD_PUBLIC_KEY" | "DISCORD_CLIENT_ID" | "DISCORD_TOKEN" | "GITHUB_TOKEN" | "GITHUB_DEFAULT_OWNER" | "GITHUB_DEFAULT_REPO">> {}
 }
 
 // Begin runtime types

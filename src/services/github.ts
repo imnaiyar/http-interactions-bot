@@ -1,4 +1,4 @@
-import type { Env } from '@/bot';
+import type { Env } from '../bot';
 
 const GITHUB_API_BASE = 'https://api.github.com';
 
@@ -59,17 +59,17 @@ export class GitHubAPI {
 
 	private async request(endpoint: string, options: RequestInit = {}): Promise<Response> {
 		const url = `${GITHUB_API_BASE}${endpoint}`;
-		const headers = {
+		const headers: Record<string, string> = {
 			'Authorization': `Bearer ${this.token}`,
 			'Accept': 'application/vnd.github+json',
 			'X-GitHub-Api-Version': '2022-11-28',
 			'User-Agent': 'Discord-Bot-HTTP-Interactions',
-			...options.headers,
+			...(options.headers as Record<string, string>),
 		};
 
-		if (options.body && typeof options.body === 'object') {
+		// Handle JSON body
+		if (options.body && typeof options.body === 'string' && options.body.startsWith('{')) {
 			headers['Content-Type'] = 'application/json';
-			options.body = JSON.stringify(options.body);
 		}
 
 		const response = await fetch(url, {
@@ -80,7 +80,7 @@ export class GitHubAPI {
 		if (!response.ok) {
 			let errorMessage = `GitHub API Error: ${response.status} ${response.statusText}`;
 			try {
-				const errorData = await response.json();
+				const errorData = await response.json() as any;
 				if (errorData.message) {
 					errorMessage += ` - ${errorData.message}`;
 				}
@@ -127,7 +127,7 @@ export class GitHubAPI {
 
 		const response = await this.request(`/repos/${actualOwner}/${actualRepo}/issues`, {
 			method: 'POST',
-			body: data,
+			body: JSON.stringify(data),
 		});
 		return response.json();
 	}
@@ -142,7 +142,7 @@ export class GitHubAPI {
 
 		const response = await this.request(`/repos/${actualOwner}/${actualRepo}/issues/${issueNumber}`, {
 			method: 'PATCH',
-			body: data,
+			body: JSON.stringify(data),
 		});
 		return response.json();
 	}

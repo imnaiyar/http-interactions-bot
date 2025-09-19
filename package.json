@@ -11,9 +11,9 @@
 		"register:commands": "tsx --env-file=.env.local scripts/deploy.ts",
 		"test": "vitest",
 		"cf-typegen": "wrangler types",
-		"db:migrate": "wrangler d1 migrations apply manga-bot-db",
-		"db:migrate:local": "wrangler d1 migrations apply manga-bot --local",
-		"db:create-migration": "wrangler d1 migrations create manga-bot"
+		"db:migrate": "wrangler d1 migrations apply utility-bot --remote",
+		"db:migrate:local": "wrangler d1 migrations apply utility-bot --local",
+		"db:create-migration": "wrangler d1 migrations create utility-bot"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "^1.13.3",
@@ -31,6 +31,7 @@
 		"@discordjs/formatters": "^0.6.1",
 		"@discordjs/rest": "^3.0.0-dev.1757851336-b66f52f9a",
 		"@discordjs/util": "^1.1.1",
+		"@octokit/rest": "^22.0.0",
 		"@sapphire/discord-utilities": "^3.5.0",
 		"@sapphire/snowflake": "^3.5.5",
 		"@sapphire/stopwatch": "^1.5.4",

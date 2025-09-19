@@ -9,10 +9,16 @@ import snap from '@/commands/slash/snap';
 import ephemeral from '@/commands/slash/ephemeral';
 import userinfo from '@/commands/slash/userinfo';
 import reminders from '@/commands/slash/reminders';
-// Commands with autocomplete need special handling
+import github from '@/commands/slash/github';
+import register from '@/commands/slash/register';
+// commands with autocomplete
 /* import todo from "@/commands/slash/todo"; */
 import bookmarks from '@/commands/slash/bookmarks';
 import convert from '@/commands/slash/convert';
+import githubIssues from '@/commands/slash/github-issues';
+import githubPr from '@/commands/slash/github-pr';
+import githubWorkflows from '@/commands/slash/github-workflows';
+import githubFiles from '@/commands/slash/github-files';
 
 // Static imports for context menus
 import translate from '@/commands/contexts/translate';
@@ -26,7 +32,7 @@ export function loadSlash(_dirs: string) {
 	const commands = new Collection<string, SlashCommand>();
 
 	// Add slash commands without autocomplete
-	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert] as SlashCommand[];
+	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert, github, register] as SlashCommand[];
 
 	for (const command of simpleCommands) {
 		try {
@@ -40,7 +46,13 @@ export function loadSlash(_dirs: string) {
 	}
 
 	// Add commands with autocomplete (need explicit typing)
-	const autocompleteCommands: SlashCommand<true>[] = [bookmarks as SlashCommand<true>];
+	const autocompleteCommands: SlashCommand<true>[] = [
+		bookmarks as SlashCommand<true>,
+		githubIssues as SlashCommand<true>,
+		githubPr as SlashCommand<true>,
+		githubWorkflows as SlashCommand<true>,
+		githubFiles as SlashCommand<true>,
+	];
 
 	for (const command of autocompleteCommands) {
 		try {

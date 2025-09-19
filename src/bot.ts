@@ -22,6 +22,7 @@ import { loadSlash, loadContext, validate } from '@/handlers';
 import { handleReminders } from '@/handlers';
 import config from '@/config';
 import { DiscordAPI, type RawFile } from '@/services/discord';
+import { GitHubAPI } from '@/services/github';
 
 type RepliableInteractions = Exclude<APIInteraction, APIApplicationCommandAutocompleteInteraction>;
 
@@ -31,12 +32,14 @@ export class Bot {
 	public config = config;
 	public channels = new Collection<string, APIChannel | APIDMChannel>();
 	public api: DiscordAPI;
+	public github: GitHubAPI;
 	public ephemeral: MessageFlags.Ephemeral | undefined = MessageFlags.Ephemeral;
 	public env: Env;
 
 	constructor(env: Env) {
 		this.env = env;
 		this.api = new DiscordAPI(env);
+		this.github = new GitHubAPI(env);
 		this.init();
 	}
 

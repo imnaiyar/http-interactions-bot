@@ -27,7 +27,7 @@ export function loadSlash(_dirs: string) {
 	const commands = new Collection<string, SlashCommand>();
 
 	// Add slash commands without autocomplete
-	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert, github] as SlashCommand[];
+	const simpleCommands = [ping, facts, evalCommand, snap, ephemeral, userinfo, reminders, convert] as SlashCommand[];
 
 	for (const command of simpleCommands) {
 		try {
@@ -41,7 +41,7 @@ export function loadSlash(_dirs: string) {
 	}
 
 	// Add commands with autocomplete (need explicit typing)
-	const autocompleteCommands: SlashCommand<true>[] = [bookmarks as SlashCommand<true>];
+	const autocompleteCommands: SlashCommand<true>[] = [bookmarks as SlashCommand<true>, github as SlashCommand<true>];
 
 	for (const command of autocompleteCommands) {
 		try {

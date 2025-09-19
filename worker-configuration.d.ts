@@ -8,6 +8,7 @@ declare namespace Cloudflare {
 	interface Env {
 		REMINDERS: KVNamespace;
 		bookmarks: KVNamespace;
+		db: D1Database;
 		DISCORD_PUBLIC_KEY: string;
 		DISCORD_CLIENT_ID: string;
 		DISCORD_TOKEN: string;

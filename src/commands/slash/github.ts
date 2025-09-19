@@ -1,7 +1,16 @@
 import { ContextType, IntegrationType, type SlashCommand } from '@/structures';
 import { ApplicationCommandOptionType } from 'discord-api-types/v10';
 import { EmbedBuilder } from '@discordjs/builders';
-import { GitHubAPI, type GitHubConfig } from '@/services/github';
+import { GitHubAPI } from '@/services/github';
+import { UserPreferencesService } from '@/services/userPreferences';
+import {
+	commonGitHubOptions,
+	parseGitHubConfig,
+	handleIssueAutocomplete,
+	handlePRAutocomplete,
+	handleWorkflowAutocomplete,
+	handleFileAutocomplete,
+} from '@/services/githubCommands';
 
 export default {
 	data: {

@@ -29,6 +29,9 @@
 			"id": "bb45f533a2da433ab223f2e0d2150a9e"
 		}
 	],
+	"triggers": {
+		"crons": ["*/1 * * * *"]
+	}
 	/*
 	"d1_databases": [
 		{

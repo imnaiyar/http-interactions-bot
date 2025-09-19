@@ -62,7 +62,7 @@ export default {
 			});
 			return;
 		}
-		if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => v.id === user!.id)) {
+		if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => v.id === app.env.DISCORD_CLIENT_ID)) {
 			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'You can only use this command in my DMs',
 			});

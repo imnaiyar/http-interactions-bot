@@ -2,7 +2,7 @@ import { IntegrationType, type SlashCommand } from '@/structures';
 import { codeBlock, EmbedBuilder } from '@discordjs/builders';
 import { ApplicationCommandOptionType, MessageFlags } from 'discord-api-types/v10';
 import { Stopwatch } from '@sapphire/stopwatch';
-import { postToHaste } from '@/utils';
+import { postToHaste, safeEvaluate } from '@/utils';
 
 // For Workers compatibility, use a basic inspect function instead of Node's util.inspect
 function inspect(obj: any, options: { depth?: number } = {}): string {
@@ -31,7 +31,7 @@ function inspect(obj: any, options: { depth?: number } = {}): string {
 export default {
 	data: {
 		name: 'eval',
-		description: 'evaluate',
+		description: 'evaluate basic expressions (limited for Workers compatibility)',
 		options: [
 			{
 				name: 'exp',
@@ -69,7 +69,17 @@ export default {
 		const async = options.getBoolean('async');
 		const haste = options.getBoolean('haste') || false;
 		const hide = options.getBoolean('hide');
-		if (async) code = `(async () => { ${code} })()`;
+		
+		// Note: async wrapping is not supported in the safe evaluator
+		// as it requires full JavaScript execution capabilities
+		if (async) {
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
+				content: 'Async expressions are not supported in the Workers-compatible evaluator. Please use synchronous expressions only.',
+				flags: hide ? MessageFlags.Ephemeral : undefined,
+			});
+			return;
+		}
+		
 		const dp = options.getString('depth') || '0';
 		const regex = /^\d+$|^Infinity$|^null$/;
 
@@ -77,17 +87,27 @@ export default {
 		if (code.includes('process.env') || code.includes('TOKEN') || code.includes('DISCORD')) {
 			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'You cannot evaluate an expression that may expose secrets',
+				flags: hide ? MessageFlags.Ephemeral : undefined,
 			});
+			return;
 		}
 		if (!match) {
 			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: `${dp} is not a valid depth`,
+				flags: hide ? MessageFlags.Ephemeral : undefined,
 			});
+			return;
 		}
 		let result;
 		try {
 			const time = new Stopwatch().start();
-			const output = await eval(code);
+			// Use safe evaluator instead of eval() for Workers compatibility
+			const output = await safeEvaluate(code, {
+				// Provide some useful context for evaluation
+				app,
+				interaction,
+				options,
+			});
 			time.stop();
 			result = await buildSuccessResponse(output, time.toString(), haste, parseInt(dp), code);
 		} catch (err) {
@@ -99,6 +119,11 @@ export default {
 } satisfies SlashCommand;
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
+	// Check if output contains an error from the safe evaluator
+	if (output && typeof output === 'object' && output.__error) {
+		return buildErrorResponse(output.message + (output.note ? '\n\n' + output.note : ''));
+	}
+	
 	// Token protection
 	output = (typeof output === 'string' ? output : inspect(output, { depth: depth }))
 		.replaceAll('TOKEN', '~~REDACTED~~')

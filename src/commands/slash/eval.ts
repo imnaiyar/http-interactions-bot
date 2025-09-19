@@ -2,7 +2,8 @@ import { IntegrationType, type SlashCommand } from '@/structures';
 import { codeBlock, EmbedBuilder } from '@discordjs/builders';
 import { ApplicationCommandOptionType, MessageFlags } from 'discord-api-types/v10';
 import { Stopwatch } from '@sapphire/stopwatch';
-import { postToHaste, safeEvaluate } from '@/utils';
+import { postToHaste } from '@/utils';
+import Sval from 'sval';
 
 // For Workers compatibility, use a basic inspect function instead of Node's util.inspect
 function inspect(obj: any, options: { depth?: number } = {}): string {
@@ -31,7 +32,7 @@ function inspect(obj: any, options: { depth?: number } = {}): string {
 export default {
 	data: {
 		name: 'eval',
-		description: 'evaluate basic expressions (limited for Workers compatibility)',
+		description: 'evaluate JavaScript expressions safely using Sval interpreter',
 		options: [
 			{
 				name: 'exp',
@@ -70,14 +71,9 @@ export default {
 		const haste = options.getBoolean('haste') || false;
 		const hide = options.getBoolean('hide');
 		
-		// Note: async wrapping is not supported in the safe evaluator
-		// as it requires full JavaScript execution capabilities
+		// Wrap in async function if requested
 		if (async) {
-			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
-				content: 'Async expressions are not supported in the Workers-compatible evaluator. Please use synchronous expressions only.',
-				flags: hide ? MessageFlags.Ephemeral : undefined,
-			});
-			return;
+			code = `(async () => { ${code} })()`;
 		}
 		
 		const dp = options.getString('depth') || '0';
@@ -101,13 +97,36 @@ export default {
 		let result;
 		try {
 			const time = new Stopwatch().start();
-			// Use safe evaluator instead of eval() for Workers compatibility
-			const output = await safeEvaluate(code, {
-				// Provide some useful context for evaluation
-				app,
-				interaction,
-				options,
+			
+			// Use Sval interpreter for safe JavaScript execution
+			const interpreter = new Sval({
+				ecmaVer: 2020,
+				sandBox: true,
 			});
+			
+			// Add some useful globals to the interpreter context
+			interpreter.import('console', console);
+			interpreter.import('Math', Math);
+			interpreter.import('Date', Date);
+			interpreter.import('JSON', JSON);
+			interpreter.import('Array', Array);
+			interpreter.import('Object', Object);
+			interpreter.import('String', String);
+			interpreter.import('Number', Number);
+			interpreter.import('Boolean', Boolean);
+			interpreter.import('app', app);
+			interpreter.import('interaction', interaction);
+			interpreter.import('options', options);
+			
+			// Execute the code and get the result
+			interpreter.run(`exports.result = ${code}`);
+			let output = interpreter.exports.result;
+			
+			// Handle promises (for async code)
+			if (output && typeof output.then === 'function') {
+				output = await output;
+			}
+			
 			time.stop();
 			result = await buildSuccessResponse(output, time.toString(), haste, parseInt(dp), code);
 		} catch (err) {
@@ -119,11 +138,6 @@ export default {
 } satisfies SlashCommand;
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
-	// Check if output contains an error from the safe evaluator
-	if (output && typeof output === 'object' && output.__error) {
-		return buildErrorResponse(output.message + (output.note ? '\n\n' + output.note : ''));
-	}
-	
 	// Token protection
 	output = (typeof output === 'string' ? output : inspect(output, { depth: depth }))
 		.replaceAll('TOKEN', '~~REDACTED~~')

@@ -44,6 +44,9 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
+      sval:
+        specifier: ^0.6.7
+        version: 0.6.7
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.13.3
@@ -1099,6 +1102,9 @@ packages:
   supports-color@10.2.2:
     resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
     engines: {node: '>=18'}
+
+  sval@0.6.7:
+    resolution: {integrity: sha512-RLkd73Wkx55fAiz250B4XBgufLiT8k1T6cbWM2/EoALkJNTkX5gYMNpvHsmhc+NQqMn3Bu99Kty2PKyunYiLsw==}
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -2164,6 +2170,10 @@ snapshots:
       js-tokens: 9.0.1
 
   supports-color@10.2.2: {}
+
+  sval@0.6.7:
+    dependencies:
+      acorn: 8.14.0
 
   tinybench@2.9.0: {}
 

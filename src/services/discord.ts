@@ -1,9 +1,9 @@
-import type { 
+import type {
 	APIApplicationCommandAutocompleteResponse,
 	APIInteractionResponseCallbackData,
 	APIUser,
 	APIGuildMember,
-	Snowflake
+	Snowflake,
 } from 'discord-api-types/v10';
 
 const BASE_API = 'https://discord.com/api/v10';
@@ -66,7 +66,7 @@ export class DiscordAPI {
 		return response.json();
 	}
 
-	// Guild methods  
+	// Guild methods
 	async getGuildMember(guildId: string, userId: string): Promise<APIGuildMember> {
 		const response = await this.rest.get(`/guilds/${guildId}/members/${userId}`);
 		if (!response.ok) {
@@ -85,10 +85,14 @@ export class DiscordAPI {
 	}
 
 	// Interaction methods
-	async replyToInteraction(interactionId: string, interactionToken: string, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
+	async replyToInteraction(
+		interactionId: string,
+		interactionToken: string,
+		data: APIInteractionResponseCallbackData & { files?: RawFile[] },
+	) {
 		const response = await this.rest.post(`/interactions/${interactionId}/${interactionToken}/callback`, {
 			type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-			data
+			data,
 		});
 		if (!response.ok) {
 			throw new Error(`Failed to reply to interaction: ${response.status} ${response.statusText}`);
@@ -99,7 +103,7 @@ export class DiscordAPI {
 	async deferInteraction(interactionId: string, interactionToken: string, data?: { flags?: number }) {
 		const response = await this.rest.post(`/interactions/${interactionId}/${interactionToken}/callback`, {
 			type: 5, // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-			data
+			data,
 		});
 		if (!response.ok) {
 			throw new Error(`Failed to defer interaction: ${response.status} ${response.statusText}`);
@@ -107,7 +111,12 @@ export class DiscordAPI {
 		return response;
 	}
 
-	async editInteractionReply(applicationId: string, interactionToken: string, data: APIInteractionResponseCallbackData & { files?: RawFile[] }, messageId: Snowflake = '@original') {
+	async editInteractionReply(
+		applicationId: string,
+		interactionToken: string,
+		data: APIInteractionResponseCallbackData & { files?: RawFile[] },
+		messageId: Snowflake = '@original',
+	) {
 		const response = await this.rest.patch(`/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`, data);
 		if (!response.ok) {
 			throw new Error(`Failed to edit interaction reply: ${response.status} ${response.statusText}`);
@@ -115,10 +124,14 @@ export class DiscordAPI {
 		return response.json();
 	}
 
-	async updateInteractionMessage(interactionId: string, interactionToken: string, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
+	async updateInteractionMessage(
+		interactionId: string,
+		interactionToken: string,
+		data: APIInteractionResponseCallbackData & { files?: RawFile[] },
+	) {
 		const response = await this.rest.post(`/interactions/${interactionId}/${interactionToken}/callback`, {
 			type: 7, // UPDATE_MESSAGE
-			data
+			data,
 		});
 		if (!response.ok) {
 			throw new Error(`Failed to update interaction message: ${response.status} ${response.statusText}`);
@@ -134,7 +147,11 @@ export class DiscordAPI {
 		return response;
 	}
 
-	async followUpInteraction(applicationId: string, interactionToken: string, data: APIInteractionResponseCallbackData & { files?: RawFile[] }) {
+	async followUpInteraction(
+		applicationId: string,
+		interactionToken: string,
+		data: APIInteractionResponseCallbackData & { files?: RawFile[] },
+	) {
 		const response = await this.rest.post(`/webhooks/${applicationId}/${interactionToken}`, data);
 		if (!response.ok) {
 			throw new Error(`Failed to follow up interaction: ${response.status} ${response.statusText}`);
@@ -142,10 +159,14 @@ export class DiscordAPI {
 		return response.json();
 	}
 
-	async createAutocompleteResponse(interactionId: string, interactionToken: string, data: APIApplicationCommandAutocompleteResponse['data']) {
+	async createAutocompleteResponse(
+		interactionId: string,
+		interactionToken: string,
+		data: APIApplicationCommandAutocompleteResponse['data'],
+	) {
 		const response = await this.rest.post(`/interactions/${interactionId}/${interactionToken}/callback`, {
 			type: 8, // APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
-			data
+			data,
 		});
 		if (!response.ok) {
 			throw new Error(`Failed to create autocomplete response: ${response.status} ${response.statusText}`);

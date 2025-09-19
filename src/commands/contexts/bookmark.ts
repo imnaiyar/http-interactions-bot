@@ -19,7 +19,7 @@ export default {
 		const url = messageLink(message.channel_id, message.id, interaction.guild_id ?? '@me');
 		const bookmarked = (await app.env.bookmarks.getWithMetadata<'', Bookmark>(message.id, 'json')).metadata;
 		if (bookmarked) {
-			await app.api.replyToInteraction(interaction.id, interaction.token, {
+			await app.editReply(interaction, {
 				content: 'This message is already bookmarked',
 				flags: app.ephemeral,
 			});
@@ -37,7 +37,7 @@ export default {
 			},
 		});
 
-		await app.api.replyToInteraction(interaction.id, interaction.token, {
+		await app.editReply(interaction, {
 			content: 'Bookmark saved!',
 			flags: app.ephemeral,
 		});

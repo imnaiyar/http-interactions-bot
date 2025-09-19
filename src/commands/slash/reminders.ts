@@ -49,7 +49,6 @@ export default {
 		contexts: [ContextType.BotDM, ContextType.Guild, ContextType.PrivateChannels],
 	},
 	async run(app, interaction, options) {
-		await app.api.deferInteraction(interaction.id, interaction.token, { flags: app.ephemeral });
 		const user = interaction.user || interaction.member?.user;
 		const text = options.getString('text', true);
 		const months = options.getInteger('months', false);

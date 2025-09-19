@@ -19,7 +19,6 @@ export default {
 	},
 	async run(app, interaction, options) {
 		const message = options.getTargetMessage();
-		await app.api.deferInteraction(interaction.id, interaction.token, { flags: app.ephemeral });
 		const content = message.content;
 		if (!content) {
 			await app.api.editInteractionReply(interaction.application_id, interaction.token, NO_CODE_RESPONSE);

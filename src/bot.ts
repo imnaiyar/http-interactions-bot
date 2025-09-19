@@ -12,10 +12,10 @@ import {
 	type Snowflake,
 	type APIMessageComponentInteraction,
 	type APIModalSubmitInteraction,
+	InteractionResponseType,
 } from 'discord-api-types/v10';
 import { Collection } from '@discordjs/collection';
 import { InteractionOptionResolver } from '@sapphire/discord-utilities';
-import { InteractionResponseType } from 'discord-interactions';
 
 import type { ContextMenu, SlashCommand } from '@/structures';
 import { loadSlash, loadContext, validate } from '@/handlers';
@@ -31,7 +31,7 @@ export class Bot {
 	public config = config;
 	public channels = new Collection<string, APIChannel | APIDMChannel>();
 	public api: DiscordAPI;
-	public ephemeral: MessageFlags | undefined = MessageFlags.Ephemeral;
+	public ephemeral: MessageFlags.Ephemeral | undefined = MessageFlags.Ephemeral;
 	public env: Env;
 
 	constructor(env: Env) {
@@ -53,7 +53,7 @@ export class Bot {
 		}
 	}
 
-	async handleApplicationCommand(interaction: APIApplicationCommandInteraction): Promise<Response> {
+	async handleApplicationCommand(interaction: APIApplicationCommandInteraction, ctx: ExecutionContext): Promise<Response> {
 		const options = new InteractionOptionResolver(interaction as any);
 
 		if (interaction.data.type === ApplicationCommandType.ChatInput) {
@@ -63,11 +63,19 @@ export class Bot {
 			if (!isValid) {
 				return new Response('Unauthorized', { status: 403 });
 			}
-
 			try {
-				await command!.run(this, interaction as unknown as APIChatInputApplicationCommandInteraction, options);
+				ctx.waitUntil(
+					(async () => await command!.run(this, interaction as unknown as APIChatInputApplicationCommandInteraction, options))(),
+				);
 				// Return empty response since Discord API calls handle the response
-				return new Response(null, { status: 200 });
+				const hide = options.getBoolean('hide', false);
+				return new Response(
+					JSON.stringify({
+						type: InteractionResponseType.DeferredChannelMessageWithSource,
+						data: { flags: hide === null ? this.ephemeral : hide ? MessageFlags.Ephemeral : undefined },
+					}),
+					{ headers: { 'Content-Type': 'application/json' } },
+				);
 			} catch (err) {
 				console.error('Command execution error:', err);
 				return new Response('Internal error', { status: 500 });
@@ -82,8 +90,14 @@ export class Bot {
 			}
 
 			try {
-				await command!.run(this, interaction as unknown as APIContextMenuInteraction, options);
-				return new Response(null, { status: 200 });
+				ctx.waitUntil((async () => await command!.run(this, interaction as unknown as APIContextMenuInteraction, options))());
+				return new Response(
+					JSON.stringify({
+						type: InteractionResponseType.DeferredChannelMessageWithSource,
+						data: { flags: this.ephemeral },
+					}),
+					{ headers: { 'Content-Type': 'application/json' } },
+				);
 			} catch (err) {
 				console.error('Context command execution error:', err);
 				return new Response('Internal error', { status: 500 });
@@ -93,12 +107,12 @@ export class Bot {
 		return new Response('Unknown command type', { status: 400 });
 	}
 
-	async handleAutocomplete(interaction: APIApplicationCommandAutocompleteInteraction): Promise<Response> {
+	async handleAutocomplete(interaction: APIApplicationCommandAutocompleteInteraction, ctx: ExecutionContext): Promise<Response> {
 		const command = this.slash.get(interaction.data.name) as unknown as SlashCommand<true>;
 		if (!command) {
 			return new Response(
 				JSON.stringify({
-					type: InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					type: InteractionResponseType.ApplicationCommandAutocompleteResult,
 					data: { choices: [{ name: 'No command found! Something went wrong', value: null }] },
 				}),
 				{ headers: { 'Content-Type': 'application/json' } },
@@ -107,26 +121,34 @@ export class Bot {
 
 		const options = new InteractionOptionResolver(interaction as any);
 		try {
-			const run = command.autocomplete!;
-			await run(this, interaction, options);
-			return new Response(null, { status: 200 });
+			const choices = await command.autocomplete!(this, interaction, options);
+			return new Response(
+				JSON.stringify({
+					type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+					data: choices,
+				}),
+				{ headers: { 'Content-Type': 'application/json' } },
+			);
 		} catch (err) {
 			console.error('Autocomplete error:', err);
 			return new Response('Internal error', { status: 500 });
 		}
 	}
 
-	async handleMessageComponent(interaction: APIMessageComponentInteraction): Promise<Response> {
+	async handleMessageComponent(interaction: APIMessageComponentInteraction, ctx: ExecutionContext): Promise<Response> {
 		const userId = interaction.data.custom_id.split(';')[1];
-		if (!userId) {
-			return new Response('Invalid component', { status: 400 });
-		}
 
-		if (userId !== (interaction.member?.user || interaction.user!).id) {
-			await this.reply(interaction, {
-				content: 'This is not your interaction. Nice try tho Haha!!',
-				flags: 64,
-			});
+		if (userId && userId !== (interaction.member?.user || interaction.user!).id) {
+			return new Response(
+				JSON.stringify({
+					type: InteractionResponseType.ChannelMessageWithSource,
+					data: {
+						content: 'This is not your interaction. Nice try tho Haha!!',
+						flags: 64,
+					},
+				}),
+				{ headers: { 'Content-Type': 'application/json' } },
+			);
 		}
 
 		return new Response(null, { status: 200 });

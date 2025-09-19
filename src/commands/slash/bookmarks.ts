@@ -54,9 +54,8 @@ export default {
 		const sub = options.getSubcommand();
 		const hide = options.getBoolean('hide');
 		if (!value || value === 'null') {
-			await app.api.replyToInteraction(interaction.id, interaction.token, {
+			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'Invalid Keyword: No bookmarks found with that keyword',
-				flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
 			});
 			return;
 		}
@@ -66,9 +65,8 @@ export default {
 		switch (sub) {
 			case 'get': {
 				if (!bookmark) {
-					await app.api.replyToInteraction(interaction.id, interaction.token, {
+					await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 						content: 'Invalid Keyword: No bookmarks found with that keyword',
-						flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
 					});
 					return;
 				}
@@ -79,23 +77,21 @@ export default {
 				const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Link').setURL(bookmark.url),
 				);
-				await app.api.replyToInteraction(interaction.id, interaction.token, {
+				await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 					embeds: [embed.toJSON() as any],
 					components: [buttons.toJSON() as any],
-					flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
 				});
 				break;
 			}
 			case 'delete': {
 				if (!bookmark) {
-					await app.api.replyToInteraction(interaction.id, interaction.token, {
+					await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 						content: 'Invalid Keyword: No bookmark found with that keyword',
-						flags: MessageFlags.Ephemeral,
 					});
 					return;
 				}
 				await app.env.bookmarks.delete(value);
-				await app.reply(interaction, {
+				await app.editReply(interaction, {
 					content: 'Bookmark Deleted',
 					embeds: [],
 					components: [],
@@ -106,21 +102,19 @@ export default {
 	async autocomplete(app, interaction, options) {
 		try {
 			const op = options.getFocusedOption();
-			console.log('Hello: autocomplete');
 			const value = op.value as string;
 			const bookmarks = (await app.env.bookmarks.list<Bookmark>({ prefix: '' })).keys.map((v) => v.metadata).filter(Boolean) as Bookmark[];
 			const parsed = bookmarks.filter((v) => v.authorId === (interaction.member?.user.id ?? interaction.user!.id));
 
 			if (!parsed) {
-				await app.api.createAutocompleteResponse(interaction.id, interaction.token, {
+				return {
 					choices: [
 						{
 							name: 'No saved bookmarks',
 							value: 'null',
 						},
 					],
-				});
-				return;
+				};
 			}
 			let data = Object.values(parsed)
 				.filter(
@@ -135,14 +129,13 @@ export default {
 					name: `${v.username}: ${v.content.substring(0, 40)}...`,
 					value: v.messageId.toString(),
 				}));
-			await app.api.createAutocompleteResponse(interaction.id, interaction.token, {
-				choices: data,
-			});
+			return { choices: data.slice(0, 25) };
 		} catch (err) {
-			await app.api.createAutocompleteResponse(interaction.id, interaction.token, {
-				choices: [{ name: 'Something went wrong', value: 'wrong' }],
-			});
 			console.error(err);
+
+			return {
+				choices: [{ name: 'Something went wrong', value: 'wrong' }],
+			};
 		}
 	},
 } satisfies SlashCommand<true>;

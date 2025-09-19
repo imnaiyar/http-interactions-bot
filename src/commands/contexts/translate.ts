@@ -11,9 +11,6 @@ export default {
 	},
 	async run(app, interaction, options) {
 		const message = options.getTargetMessage();
-		await app.api.deferInteraction(interaction.id, interaction.token, {
-			flags: app.ephemeral,
-		});
 		const output = await translate(message.content, { to: 'en' });
 		const inputLang = ISO6391.getName(output.raw.src);
 		if (inputLang === ISO6391.getName('en')) {

@@ -7,12 +7,12 @@ function hextToUint8(value: string): Uint8Array {
 	return new Uint8Array(hexVal);
 }
 
-export async function verify(req: Request, env: Env): Promise<Response | undefined> {
+export async function verify(req: Request, env: Env): Promise<boolean> {
 	const timestamp = req.headers.get('X-Signature-Timestamp');
 	const signature = req.headers.get('X-Signature-Ed25519');
 
 	if (!timestamp || !signature) {
-		return new Response('Missing signature headers', { status: 401 });
+		return false;
 	}
 
 	const bodyText = await req.clone().text();
@@ -24,20 +24,11 @@ export async function verify(req: Request, env: Env): Promise<Response | undefin
 		hextToUint8(env.DISCORD_PUBLIC_KEY!),
 		{ name: 'NODE-ED25519', namedCurve: 'NODE-ED25519' },
 		false,
-		['verify']
+		['verify'],
 	);
 
 	const isValid = await crypto.subtle.verify({ name: 'NODE-ED25519' }, pubKey, hextToUint8(signature), message);
+	if (!isValid) return false;
 
-	if (!isValid) {
-		return new Response('Invalid signature', { status: 401 });
-	}
-
-	const parsed = JSON.parse(bodyText);
-	if (parsed.type === 1) {
-		return new Response(JSON.stringify({ type: 1 }), {
-			status: 200,
-			headers: { 'Content-Type': 'application/json' },
-		});
-	}
+	return true;
 }

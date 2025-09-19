@@ -1,11 +1,14 @@
 {
-	"name": "read-manga-bot",
+	"name": "utility",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
+		"dev": "vite dev",
+		"start": "vite dev",
+		"preview": "pnpm build && vite preview",
+		"build": "vite build",
+		"register:commands": "tsx --env-file=.env.local scripts/deploy.ts",
 		"test": "vitest",
 		"cf-typegen": "wrangler types",
 		"db:migrate": "wrangler d1 migrations apply manga-bot-db",
@@ -13,9 +16,12 @@
 		"db:create-migration": "wrangler d1 migrations create manga-bot"
 	},
 	"devDependencies": {
+		"@cloudflare/vite-plugin": "^1.13.3",
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
 		"@types/node": "^24.5.2",
 		"typescript": "^5.5.2",
+		"vite": "^7.1.6",
+		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "~3.2.0",
 		"wrangler": "^4.35.0"
 	},
@@ -33,5 +39,6 @@
 		"discord-interactions": "^4.3.0",
 		"iso-639-1": "^3.1.5",
 		"prettier": "^3.6.2"
-	}
+	},
+	"packageManager": "pnpm@10.15.1"
 }

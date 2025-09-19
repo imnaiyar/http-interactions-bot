@@ -4,21 +4,32 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "https-int-bot",
+	"name": "utility-bot",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-09-10",
-	"compatibility_flags": ["nodejs_compat"],
-	"env": { "development": { "name": "http-dev"} },
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"observability": {
 		"enabled": true
 	},
-	"kv_namespaces": [{ "binding": "REMINDERS", "id": "reminders", "preview_id": "reminder.preview"}, { "binding": "bookmarks", "id": "BOOKMARKS", "preview_id": "bookmarks_preview" }, { "binding": "todos", "id": "TODOS", "preview_id": "todos_preview" }],
-	/* "routes": [
+	"routes": [
 		{
-			"pattern": "manga-bot.imnaiyar.site",
+			"pattern": "interactions.imnaiyar.site",
 			"custom_domain": true
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "REMINDERS",
+			"id": "57cfb1a11c8e4ca7bf6ba2cfa74c3494"
+		},
+		{
+			"binding": "bookmarks",
+			"id": "bb45f533a2da433ab223f2e0d2150a9e"
+		}
+	],
+	/*
 	"d1_databases": [
 		{
 			"binding": "db",

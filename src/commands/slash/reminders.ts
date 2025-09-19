@@ -61,11 +61,13 @@ export default {
 			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'You must provide at least one time options.',
 			});
+			return;
 		}
 		if (interaction.channel.type !== ChannelType.DM || !interaction.channel.recipients?.find((v) => v.id === user!.id)) {
 			await app.api.editInteractionReply(interaction.application_id, interaction.token, {
 				content: 'You can only use this command in my DMs',
 			});
+			return;
 		}
 		const dur =
 			Date.now() +

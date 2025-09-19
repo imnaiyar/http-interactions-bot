@@ -94,64 +94,11 @@ export default {
 					});
 					return;
 				}
-				const embed = new EmbedBuilder()
-					.setTitle(`Are you sure you want to delete this?`)
-					.setDescription(`**Message**\n${bookmark.content.substring(0, 2000)}\n\nAuthor: ${bookmark.username}`)
-					.setColor(0xff0000)
-					.toJSON();
-				const buttons = new ActionRowBuilder<ButtonBuilder>()
-					.addComponents(
-						new ButtonBuilder()
-							.setCustomId('yes' + `;${(interaction.member?.user || interaction.user!).id}`)
-							.setLabel('Yes')
-							.setStyle(ButtonStyle.Danger),
-						new ButtonBuilder()
-							.setCustomId('no' + `;${(interaction.member?.user || interaction.user!).id}`)
-							.setLabel('No')
-							.setStyle(ButtonStyle.Success),
-						new ButtonBuilder().setLabel('Message Link').setStyle(ButtonStyle.Link).setURL(bookmark.url),
-					)
-					.toJSON();
-				await app.api.replyToInteraction(interaction.id, interaction.token, {
-					embeds: [embed as any],
-					components: [buttons as any],
-					flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
-				});
-				const collector = new app.collector(app, {
-					filter: (init) =>
-						(init.user?.id ?? init.member!.user.id) === userId &&
-						(init.data.custom_id.startsWith('yes') || init.data.custom_id.startsWith('no')),
-					timeout: 60_000,
-					max: 1,
-				});
-				collector.on('collect', async (int) => {
-					const id = int.data.custom_id.split(';')[0];
-					switch (id) {
-						case 'yes': {
-							await app.env.bookmarks.delete(value);
-							app.update(int, {
-								content: 'Bookmark Deleted',
-								embeds: [],
-								components: [],
-							});
-							break;
-						}
-						case 'no': {
-							app.update(int, {
-								content: 'Canceled deletion',
-								components: [],
-							});
-						}
-					}
-				});
-				collector.on('end', async (_collected, reason) => {
-					if (reason === 'timeout') {
-						app.api.editInteractionReply(interaction.application_id, interaction.token, {
-							content: 'Canceled! Timed Out.',
-							embeds: [],
-							components: [],
-						});
-					}
+				await app.env.bookmarks.delete(value);
+				await app.reply(interaction, {
+					content: 'Bookmark Deleted',
+					embeds: [],
+					components: [],
 				});
 			}
 		}
@@ -188,11 +135,11 @@ export default {
 					name: `${v.username}: ${v.content.substring(0, 40)}...`,
 					value: v.messageId.toString(),
 				}));
-			app.api.createAutocompleteResponse(interaction.id, interaction.token, {
+			await app.api.createAutocompleteResponse(interaction.id, interaction.token, {
 				choices: data,
 			});
 		} catch (err) {
-			app.api.createAutocompleteResponse(interaction.id, interaction.token, {
+			await app.api.createAutocompleteResponse(interaction.id, interaction.token, {
 				choices: [{ name: 'Something went wrong', value: 'wrong' }],
 			});
 			console.error(err);

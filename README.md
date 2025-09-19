@@ -1,6 +1,6 @@
 # http-interactions-bot
 
-A modular, TypeScript-based Discord bot with support for slash commands, context menus, and various utilities. Built with Vite and Vitest for modern development and testing workflows.
+A modular, TypeScript-based Discord bot with support for slash commands, context menus, and various utilities. Built with Vite and Vitest.
 Runs on cloudflare workers
 
 ## Features

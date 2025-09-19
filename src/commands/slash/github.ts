@@ -186,6 +186,103 @@ export default {
 							},
 						],
 					},
+					{
+						name: 'create',
+						description: 'Create a new pull request',
+						type: ApplicationCommandOptionType.Subcommand,
+						options: [
+							{
+								name: 'title',
+								description: 'PR title',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'head',
+								description: 'Head branch (source)',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'base',
+								description: 'Base branch (target)',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'body',
+								description: 'PR description',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'draft',
+								description: 'Create as draft PR',
+								type: ApplicationCommandOptionType.Boolean,
+								required: false,
+							},
+							{
+								name: 'repo',
+								description: 'Repository name (owner/repo)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'token',
+								description: 'GitHub token (overrides default)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+						],
+					},
+					{
+						name: 'merge',
+						description: 'Merge a pull request',
+						type: ApplicationCommandOptionType.Subcommand,
+						options: [
+							{
+								name: 'number',
+								description: 'Pull request number',
+								type: ApplicationCommandOptionType.Integer,
+								required: true,
+							},
+							{
+								name: 'method',
+								description: 'Merge method',
+								type: ApplicationCommandOptionType.String,
+								choices: [
+									{ name: 'Merge', value: 'merge' },
+									{ name: 'Squash', value: 'squash' },
+									{ name: 'Rebase', value: 'rebase' },
+								],
+								required: false,
+							},
+							{
+								name: 'title',
+								description: 'Commit title',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'message',
+								description: 'Commit message',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'repo',
+								description: 'Repository name (owner/repo)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'token',
+								description: 'GitHub token (overrides default)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+						],
+					},
 				],
 			},
 			{
@@ -255,6 +352,92 @@ export default {
 							},
 						],
 					},
+					{
+						name: 'create',
+						description: 'Create a new file',
+						type: ApplicationCommandOptionType.Subcommand,
+						options: [
+							{
+								name: 'path',
+								description: 'File path',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'content',
+								description: 'File content',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'message',
+								description: 'Commit message',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'branch',
+								description: 'Branch to commit to',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'repo',
+								description: 'Repository name (owner/repo)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'token',
+								description: 'GitHub token (overrides default)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+						],
+					},
+					{
+						name: 'update',
+						description: 'Update an existing file',
+						type: ApplicationCommandOptionType.Subcommand,
+						options: [
+							{
+								name: 'path',
+								description: 'File path',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'content',
+								description: 'New file content',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'message',
+								description: 'Commit message',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'branch',
+								description: 'Branch to commit to',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'repo',
+								description: 'Repository name (owner/repo)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'token',
+								description: 'GitHub token (overrides default)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+						],
+					},
 				],
 			},
 			{
@@ -307,6 +490,43 @@ export default {
 									{ name: 'In Progress', value: 'in_progress' },
 									{ name: 'Completed', value: 'completed' },
 								],
+								required: false,
+							},
+							{
+								name: 'token',
+								description: 'GitHub token (overrides default)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+						],
+					},
+					{
+						name: 'trigger',
+						description: 'Trigger a workflow',
+						type: ApplicationCommandOptionType.Subcommand,
+						options: [
+							{
+								name: 'workflow',
+								description: 'Workflow ID or filename',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'ref',
+								description: 'Branch/tag/commit reference',
+								type: ApplicationCommandOptionType.String,
+								required: true,
+							},
+							{
+								name: 'inputs',
+								description: 'Workflow inputs (JSON format)',
+								type: ApplicationCommandOptionType.String,
+								required: false,
+							},
+							{
+								name: 'repo',
+								description: 'Repository name (owner/repo)',
+								type: ApplicationCommandOptionType.String,
 								required: false,
 							},
 							{
@@ -473,6 +693,59 @@ export default {
 							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
 							break;
 						}
+						case 'create': {
+							const title = options.getString('title')!;
+							const head = options.getString('head')!;
+							const base = options.getString('base')!;
+							const body = options.getString('body');
+							const draft = options.getBoolean('draft') || false;
+							
+							const pr = await github.createPullRequest(config, { 
+								title, 
+								head, 
+								base, 
+								body, 
+								draft 
+							});
+
+							const embed = new EmbedBuilder()
+								.setTitle(`✅ Pull Request Created: #${pr.number}`)
+								.setURL(pr.html_url)
+								.setColor(0x238636)
+								.setDescription(`**${pr.title}**\n\n${pr.body?.slice(0, 1000) || 'No description'}`)
+								.addFields([
+									{ name: 'Head', value: pr.head.ref, inline: true },
+									{ name: 'Base', value: pr.base.ref, inline: true },
+									{ name: 'Draft', value: draft ? 'Yes' : 'No', inline: true },
+								]);
+
+							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
+							break;
+						}
+						case 'merge': {
+							const number = options.getInteger('number')!;
+							const method = options.getString('method') as 'merge' | 'squash' | 'rebase' || 'merge';
+							const commit_title = options.getString('title');
+							const commit_message = options.getString('message');
+							
+							const result = await github.mergePullRequest(config, number, {
+								merge_method: method,
+								commit_title,
+								commit_message,
+							});
+
+							const embed = new EmbedBuilder()
+								.setTitle(`✅ Pull Request #${number} Merged`)
+								.setColor(0x8b5cf6)
+								.setDescription(`Successfully merged PR #${number} using ${method} method`)
+								.addFields([
+									{ name: 'Commit SHA', value: result.sha.slice(0, 8), inline: true },
+									{ name: 'Message', value: result.message, inline: false },
+								]);
+
+							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
+							break;
+						}
 					}
 					break;
 				}
@@ -520,6 +793,62 @@ export default {
 								.addFields([
 									{ name: 'Encoding', value: fileContent.encoding, inline: true },
 									{ name: 'SHA', value: fileContent.sha.slice(0, 8), inline: true },
+								]);
+
+							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
+							break;
+						}
+						case 'create': {
+							const path = options.getString('path')!;
+							const content = options.getString('content')!;
+							const message = options.getString('message')!;
+							const branch = options.getString('branch');
+							
+							const result = await github.createFile(config, path, {
+								message,
+								content,
+								branch: branch || undefined,
+							});
+
+							const embed = new EmbedBuilder()
+								.setTitle(`✅ File Created: ${path}`)
+								.setURL(result.commit.html_url)
+								.setColor(0x238636)
+								.setDescription(`Successfully created file at ${path}`)
+								.addFields([
+									{ name: 'Commit SHA', value: result.commit.sha.slice(0, 8), inline: true },
+									{ name: 'Branch', value: branch || 'default', inline: true },
+									{ name: 'Message', value: message, inline: false },
+								]);
+
+							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
+							break;
+						}
+						case 'update': {
+							const path = options.getString('path')!;
+							const content = options.getString('content')!;
+							const message = options.getString('message')!;
+							const branch = options.getString('branch');
+							
+							// First get current file to get SHA
+							const currentFile = await github.getFileContent(config, path, branch || undefined);
+							
+							const result = await github.updateFile(config, path, {
+								message,
+								content,
+								sha: currentFile.sha,
+								branch: branch || undefined,
+							});
+
+							const embed = new EmbedBuilder()
+								.setTitle(`✅ File Updated: ${path}`)
+								.setURL(result.commit.html_url)
+								.setColor(0x0969da)
+								.setDescription(`Successfully updated file at ${path}`)
+								.addFields([
+									{ name: 'Commit SHA', value: result.commit.sha.slice(0, 8), inline: true },
+									{ name: 'Branch', value: branch || 'default', inline: true },
+									{ name: 'Message', value: message, inline: false },
 								]);
 
 							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
@@ -574,6 +903,38 @@ export default {
 												.join('\n')
 								)
 								.setFooter({ text: `Showing ${Math.min(result.workflow_runs.length, 10)} of ${result.workflow_runs.length} runs` });
+
+							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
+							break;
+						}
+						case 'trigger': {
+							const workflowId = options.getString('workflow')!;
+							const ref = options.getString('ref')!;
+							const inputsStr = options.getString('inputs');
+							
+							let inputs: Record<string, any> | undefined;
+							if (inputsStr) {
+								try {
+									inputs = JSON.parse(inputsStr);
+								} catch (error) {
+									throw new Error('Invalid JSON format for inputs parameter');
+								}
+							}
+							
+							await github.triggerWorkflow(config, workflowId, {
+								ref,
+								inputs,
+							});
+
+							const embed = new EmbedBuilder()
+								.setTitle(`✅ Workflow Triggered`)
+								.setColor(0xf78166)
+								.setDescription(`Successfully triggered workflow ${workflowId} on ${ref}`)
+								.addFields([
+									{ name: 'Workflow', value: workflowId, inline: true },
+									{ name: 'Reference', value: ref, inline: true },
+									{ name: 'Inputs', value: inputsStr || 'None', inline: false },
+								]);
 
 							await app.editReply(interaction, { embeds: [embed.toJSON() as any] });
 							break;

@@ -2,10 +2,11 @@ import type {
   APIMessageApplicationCommandInteraction,
   APIUserApplicationCommandInteraction,
   ApplicationCommandType,
-} from "@discordjs/core/http-only";
+} from "discord-api-types/v10";
 import type { ContextType, IntegrationType } from "./index";
-import App from "@/app";
+import type { Bot } from "@/bot";
 import type { InteractionOptionResolver } from "@sapphire/discord-utilities";
+
 export interface ContextMenu<T extends "User" | "Message"> {
   data: {
     name: string;
@@ -15,7 +16,7 @@ export interface ContextMenu<T extends "User" | "Message"> {
   };
   ownerOnly?: boolean;
   run: (
-    app: typeof App,
+    app: Bot,
     interaction: T extends "User" ? APIUserApplicationCommandInteraction : APIMessageApplicationCommandInteraction,
     options: InteractionOptionResolver,
   ) => Promise<void>;

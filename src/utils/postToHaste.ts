@@ -1,23 +1,21 @@
-import { request } from "undici";
-
 /**
  * Posts provided code to hastebin
  * @param code
  */
 export const postToHaste = async (code: any): Promise<string> => {
-  const req = await request("https://hst.sh/documents/", {
+  const response = await fetch("https://hst.sh/documents/", {
     method: "POST",
     body: typeof code === "object" ? JSON.stringify(code, null, 2) : code,
+    headers: {
+      'Content-Type': 'text/plain',
+    },
   });
-  if (req.statusCode !== 200) throw new Error("Status code did not return 200, something went wrong.");
+  
+  if (!response.ok) {
+    throw new Error(`Status code ${response.status}, something went wrong.`);
+  }
 
-  const bin = await req.body.json();
+  const bin = await response.json() as { key: string };
 
-  return `https://hst.sh/${
-    (
-      bin as {
-        key: string;
-      }
-    ).key
-  }.javascript`;
+  return `https://hst.sh/${bin.key}.javascript`;
 };

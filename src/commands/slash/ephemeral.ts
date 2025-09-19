@@ -1,6 +1,6 @@
 import { ContextType, IntegrationType, type SlashCommand } from "@/structures";
-import { MessageFlags } from "@discordjs/core";
-import { ApplicationCommandOptionType } from "@discordjs/core/http-only";
+import { MessageFlags } from "discord-api-types/v10";
+import { ApplicationCommandOptionType } from "discord-api-types/v10";
 export default {
   data: {
     name: "ephemeral",
@@ -20,7 +20,7 @@ export default {
   async run(app, interaction, options) {
     const hide = options.getBoolean("ephemeral");
     app.ephemeral = hide ? MessageFlags.Ephemeral : undefined;
-    await app.api.interactions.reply(interaction.id, interaction.token, {
+    await app.api.replyToInteraction(interaction.id, interaction.token, {
       content: `Ephemeral state changed to \`${hide}\``,
       flags: app.ephemeral,
     });

@@ -1,6 +1,6 @@
 import { formatUserInfo } from "@/utils";
 import type { SlashCommand } from "@/structures";
-import { ApplicationCommandOptionType } from "@discordjs/core";
+import { ApplicationCommandOptionType } from "discord-api-types/v10";
 export default {
   data: {
     name: "userinfo",
@@ -17,13 +17,13 @@ export default {
     contexts: [0, 1, 2],
   },
   async run(app, interaction, options) {
-    await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
+    await app.api.deferInteraction(interaction.id, interaction.token, { flags: app.ephemeral });
     const member = options.getMember("user");
     const targetUser = options.getUser("user")!;
     // prettier-ignore
-    const embed = formatUserInfo( member ?? undefined, targetUser, interaction, app);
-    await app.api.interactions.editReply(interaction.application_id, interaction.token, {
-      embeds: [embed.toJSON()],
+    const embed = formatUserInfo( member ?? undefined as any, targetUser, interaction, app);
+    await app.api.editInteractionReply(interaction.application_id, interaction.token, {
+      embeds: [embed.toJSON() as any],
       flags: app.ephemeral,
     });
   },

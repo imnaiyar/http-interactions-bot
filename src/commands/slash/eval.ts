@@ -1,9 +1,33 @@
 import { IntegrationType, type SlashCommand } from "@/structures";
 import { codeBlock, EmbedBuilder } from "@discordjs/builders";
-import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
+import { ApplicationCommandOptionType, MessageFlags } from "discord-api-types/v10";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { postToHaste } from "@/utils";
-import util from "node:util";
+
+// For Workers compatibility, use a basic inspect function instead of Node's util.inspect
+function inspect(obj: any, options: { depth?: number } = {}): string {
+  const depth = options.depth ?? 0;
+  
+  if (obj === null) return 'null';
+  if (obj === undefined) return 'undefined';
+  if (typeof obj === 'string') return `'${obj}'`;
+  if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+  if (typeof obj === 'function') return `[Function: ${obj.name || 'anonymous'}]`;
+  
+  if (Array.isArray(obj)) {
+    if (depth === 0) return '[Array]';
+    return `[${obj.map(item => inspect(item, { depth: depth - 1 })).join(', ')}]`;
+  }
+  
+  if (typeof obj === 'object') {
+    if (depth === 0) return '[Object]';
+    const keys = Object.keys(obj);
+    const props = keys.slice(0, 5).map(key => `${key}: ${inspect(obj[key], { depth: depth - 1 })}`);
+    return `{ ${props.join(', ')}${keys.length > 5 ? ', ...' : ''} }`;
+  }
+  
+  return String(obj);
+}
 export default {
   data: {
     name: "eval",
@@ -45,7 +69,7 @@ export default {
     const async = options.getBoolean("async");
     const haste = options.getBoolean("haste") || false;
     const hide = options.getBoolean("hide");
-    await app.api.interactions.defer(interaction.id, interaction.token, {
+    await app.api.deferInteraction(interaction.id, interaction.token, {
       flags: hide === null ? app.ephemeral : hide ? MessageFlags.Ephemeral : undefined,
     });
     if (async) code = `(async () => { ${code} })()`;
@@ -53,15 +77,15 @@ export default {
     const regex = /^\d+$|^Infinity$|^null$/;
 
     const match = dp.match(regex);
-    if (code.includes("process.env")) {
-      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+    if (code.includes("process.env") || code.includes("TOKEN") || code.includes("DISCORD")) {
+      await app.api.editInteractionReply(interaction.application_id, interaction.token, {
         content: "You cannot evaluate an expression that may expose secrets",
-      }));
+      });
     }
     if (!match) {
-      return void (await app.api.interactions.editReply(interaction.application_id, interaction.token, {
+      await app.api.editInteractionReply(interaction.application_id, interaction.token, {
         content: `${dp} is not a valid depth`,
-      }));
+      });
     }
     let result;
     try {
@@ -73,15 +97,16 @@ export default {
       console.error(err);
       result = buildErrorResponse(err);
     }
-    await app.api.interactions.editReply(interaction.application_id, interaction.token, result);
+    await app.api.editInteractionReply(interaction.application_id, interaction.token, result);
   },
 } satisfies SlashCommand;
 
 const buildSuccessResponse = async (output: any, time: string, haste: boolean, depth: number, input: any) => {
   // Token protection
-  output = (typeof output === "string" ? output : util.inspect(output, { depth: depth }))
-    .replaceAll(process.env.TOKEN!, "~~REDACTED~~")
-    .replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED--'");
+  output = (typeof output === "string" ? output : inspect(output, { depth: depth }))
+    .replaceAll("TOKEN", "~~REDACTED~~")
+    .replaceAll(/token:\s*'.*?'/g, "token: '~~REDACTED~~'")
+    .replaceAll(/DISCORD_TOKEN/g, "~~REDACTED~~");
   let embOutput;
 
   if (!haste && output.length <= 2048) {
@@ -98,7 +123,7 @@ const buildSuccessResponse = async (output: any, time: string, haste: boolean, d
     })
     .setTimestamp(Date.now());
 
-  return { embeds: [embed.toJSON()] };
+  return { embeds: [embed.toJSON() as any] };
 };
 
 const buildErrorResponse = (err: any) => {
@@ -108,5 +133,5 @@ const buildErrorResponse = (err: any) => {
     .setColor(0xff0000)
     .setTimestamp();
 
-  return { embeds: [embed.toJSON()] };
+  return { embeds: [embed.toJSON() as any] };
 };

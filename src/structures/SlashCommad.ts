@@ -2,9 +2,9 @@ import type {
   APIApplicationCommandOption,
   APIChatInputApplicationCommandInteraction,
   APIApplicationCommandAutocompleteInteraction,
-} from "@discordjs/core/http-only";
+} from "discord-api-types/v10";
 import type { ContextType, IntegrationType } from "./index";
-import App from "@/app";
+import type { Bot } from "@/bot";
 import type { InteractionOptionResolver } from "@sapphire/discord-utilities";
 
 export interface SlashCommand<Autocomplete extends boolean = false> {
@@ -17,13 +17,13 @@ export interface SlashCommand<Autocomplete extends boolean = false> {
   };
   ownerOnly?: boolean;
   run: (
-    app: typeof App,
+    app: Bot,
     interaction: APIChatInputApplicationCommandInteraction,
     options: InteractionOptionResolver,
   ) => Promise<void>;
   autocomplete?: Autocomplete extends true
     ? (
-        app: typeof App,
+        app: Bot,
         interaction: APIApplicationCommandAutocompleteInteraction,
         options: InteractionOptionResolver,
       ) => Promise<void>

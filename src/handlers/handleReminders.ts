@@ -1,35 +1,43 @@
-import type { Reminders } from "@/commands/slash/reminders";
-import toml from "toml";
-import fs from "node:fs";
-import tomlify from "tomlify";
-import { EmbedBuilder } from "@discordjs/builders";
-import App from "@/app";
-export default async (app: typeof App) => {
-  if (!fs.existsSync("reminders.toml")) return;
-  const reminders: Reminders = toml.parse(fs.readFileSync("reminders.toml", "utf8"));
-  const keys = Object.keys(reminders);
-  for (const k of keys) {
-    const { authorId: _userid, time, text, username, setAt, dmId } = reminders[k];
+import type { Bot } from '@/bot';
+import { Reminder } from '@/commands/slash/reminders';
+import { EmbedBuilder } from '@discordjs/builders';
 
-    if (time > Date.now()) continue;
-    delete reminders[k];
-    fs.writeFileSync("reminders.toml", tomlify(reminders, { delims: false }));
+export default async (_app: Bot) => {
+	// For now, reminders functionality is disabled in Workers
+	// TODO: Implement KV storage for reminders
+	const kv = _app.env.REMINDERS;
 
-    // Send the reminder
+	// Future KV implementation:
 
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: `${username} Reminder` })
-      .setTitle("Reminder")
-      .setDescription(`You asked me to remind you about: \`${text}\``)
-      .setFields({
-        name: "Set on",
-        value: "<t:" + Math.trunc(Number(setAt) / 1000) + ":F> (<t:" + Math.trunc(Number(setAt) / 1000) + ":R>)",
-      });
+	try {
+		const remindersData = (await kv.list<Reminder>().then((l) => l.keys.map((k) => [k.name, k.metadata]))).filter(Boolean) as [
+			string,
+			Reminder,
+		][];
 
-    await app.api.channels
-      .createMessage(dmId, {
-        embeds: [embed.toJSON()],
-      })
-      .catch(console.error);
-  }
+		for (const [key, reminder] of remindersData) {
+			const { authorId: _userid, time, text, username, setAt, dmId } = reminder;
+
+			if (time > Date.now()) continue;
+
+			await kv.delete(key);
+
+			// Send the reminder
+			const embed = new EmbedBuilder()
+				.setAuthor({ name: `${username} Reminder` })
+				.setTitle('Reminder')
+				.setDescription(`You asked me to remind you about: \`${text}\``)
+				.setFields({
+					name: 'Set on',
+					value: '<t:' + Math.trunc(Number(setAt) / 1000) + ':F> (<t:' + Math.trunc(Number(setAt) / 1000) + ':R>)',
+				});
+
+			await _app.api.createMessage(dmId, {
+				embeds: [embed.toJSON() as any],
+			})
+			.catch(console.error);
+		}
+	} catch (error) {
+		console.error('Error handling reminders:', error);
+	}
 };

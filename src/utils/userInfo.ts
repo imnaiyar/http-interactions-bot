@@ -1,18 +1,18 @@
 import { EmbedBuilder, roleMention, time } from "@discordjs/builders";
-import { ImageFormat, type APIGuildMember, type APIInteraction, type APIUser } from "@discordjs/core/http-only";
+import { ImageFormat, type APIGuildMember, type APIInteraction, type APIUser } from "discord-api-types/v10";
 import { UserUtil as utils } from "@/utils";
-import App from "@/app";
+import { type Bot } from "@/bot";
 import { DiscordSnowflake } from "@sapphire/snowflake";
 
 export function formatUserInfo(
   member: Omit<APIGuildMember, "deaf" | "mute"> | undefined,
   targetUser: APIUser | undefined,
   interaction: APIInteraction,
-  app: typeof App,
+  app: Bot,
 ) {
   const createdAt = targetUser && time(Math.floor(DiscordSnowflake.timestampFrom(targetUser.id) / 1000), "F");
   const embed = new EmbedBuilder().setDescription(
-    `**Account Type**: ${targetUser?.bot ? "Bot" : "User"}\n**Username**: ${targetUser?.username}\n**Account CreatedAt**: ${createdAt}\n${member ? `**Joined GuildAt**: ${time(new Date(member.joined_at), "F")}` : ""}`,
+    `**Account Type**: ${targetUser?.bot ? "Bot" : "User"}\n**Username**: ${targetUser?.username}\n**Account CreatedAt**: ${createdAt}\n${member && member.joined_at ? `**Joined GuildAt**: ${time(new Date(member.joined_at), "F")}` : ""}`,
   );
   if (member && member.roles.length) {
     embed.addFields({

@@ -1,6 +1,6 @@
 import { ContextType, IntegrationType, type SlashCommand } from "@/structures";
-import { MessageFlags } from "@discordjs/core";
-import { ApplicationCommandOptionType } from "@discordjs/core/http-only";
+import { MessageFlags } from "discord-api-types/v10";
+import { ApplicationCommandOptionType } from "discord-api-types/v10";
 import { DiscordSnowflake as Snowflake } from "@sapphire/snowflake";
 
 export default {
@@ -21,7 +21,7 @@ export default {
   async run(app, interaction, options) {
     const timestamp = Snowflake.timestampFrom(interaction.id);
     const hide = options.getBoolean("hide");
-    await app.api.interactions.reply(interaction.id, interaction.token, {
+    await app.api.replyToInteraction(interaction.id, interaction.token, {
       content: `Pong! ${Date.now() - timestamp}ms`,
       ...(hide && {
         flags: MessageFlags.Ephemeral,
